@@ -1,14 +1,16 @@
-# Housing CT · Prefab Gap Explorer
+# Housing CT · Prefab Gap Explorer 2
 
-An interactive version of `Housing_CT_Prefab_City_Models_and_Charts.xlsx`, the Housing CT Prefab Modular team's financial model. It covers one 2-unit owner-plus-rental building in Hartford, New Haven and Waterbury.
+An interactive version of `Housing_CT_Feedback_Response_Model.xlsx` (Oct 14, 2026), the Prefab Modular team's model rebuilt after External Review 1.
 
-**Live page:** https://eytanjda123.github.io/HousingCTModularModel/
+**Live page:** https://eytanjda123.github.io/HousingCTModularModel-v2/
+**Version 1 (original, unchanged):** https://eytanjda123.github.io/HousingCTModularModel/
 
-- Every workbook input has a slider, tagged Sourced, Placeholder or Team choice.
-- An input-to-output map traces each input through the calculations to price, subsidy and the remaining gap.
-- A three-city capital stack and comparison table show changes against a pinned baseline.
-- Explain mode walks through the model in six steps for presentations.
-- Research slots hold inputs not yet in the workbook (land, site prep, fee waiver, volume discount, appraisal premium, tax abatement). They start switched off.
+## What's new in version 2
+- **Two gaps.** The sales gap (appraised value minus what the buyer can pay) takes buyer-side money only. The developer gap (TDC minus sale proceeds) takes developer-side money only.
+- **Line-item pro forma** built from the redacted course budgets: site work, soft costs, Phase I, construction-loan interest and a developer fee.
+- **Four modular manufacturers with learning curves by order volume,** compared against stick-built calibrated to ~$800K.
+- **80% AMI base case** and an appraisal-basis choice.
+- **Homeowner affordability** at 60/80/100/120% AMI, with energy burden, MIT living-wage residual and stress tests.
+- **Mixed-income portfolio** across Hartford, New Haven and Waterbury.
 
-With every input at its default, the numbers match the workbook's Compare tab. Funding amounts are caps and precedents, not awards.
-
+For New Haven at the workbook's own inputs, the headline numbers match the workbook. Hartford and Waterbury reuse New Haven's itemized site and soft costs, which are flagged. Manufacturer costs are faculty placeholders, and program amounts are caps or precedents, not awards.
