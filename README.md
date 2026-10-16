@@ -14,3 +14,8 @@ An interactive version of `Housing_CT_Feedback_Response_Model.xlsx` (Oct 14, 202
 - **Mixed-income portfolio** across Hartford, New Haven and Waterbury.
 
 For New Haven at the workbook's own inputs, the headline numbers match the workbook. Hartford and Waterbury reuse New Haven's itemized site and soft costs, which are flagged. Manufacturer costs are faculty placeholders, and program amounts are caps or precedents, not awards.
+
+
+## Add-on features and procurement
+
+The inputs panel now has nested, collapsible sub-sections (construction, site work, soft costs). A new "Add-on features and procurement" group covers rooftop solar (upfront cost plus owner bill savings under CT's RRES tariff), battery storage, an efficiency / heat-pump package, two custom add-on slots, other hard-cost line items, and a warehouse for bulk buying. Everything is off or $0 by default, so the base results still match the workbook. Sliders extend when dragged to their end, and the number box accepts any value.

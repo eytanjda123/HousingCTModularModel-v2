@@ -1,10 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
-<title>Prefab Gap Explorer 2</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prefab Gap Explorer 2</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -318,10 +312,7 @@ table.left td,table.left th{text-align:left}
 .dlg-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .status{font-size:.82rem;color:var(--ink-2)}
 .status.ok{color:var(--good)} .status.err{color:var(--bad)}
-</style>
-</head>
-<body>
-
+</style></head><body>
 
 <style>
 :root{--s-hb:#7A5BB5;--s-ddoh:#3359A8;--side-b:#7A5BB5;--side-d:#0D8577}
@@ -341,6 +332,17 @@ table.ho td.pos{color:var(--good)}
 #scale{display:block;width:100%;height:auto;min-width:620px}
 .ptbl input,.ptbl select{font-family:var(--f-mono);background:var(--input-bg);color:var(--input-fg);border:1px solid transparent;border-radius:4px;padding:2px 6px}
 .ptbl input{width:64px;text-align:right}
+details.sub{border:1px solid var(--rule-2);border-radius:8px;background:var(--paper);margin:2px -4px}
+details.sub>summary{list-style:none;cursor:pointer;padding:7px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.84rem;font-weight:600;color:var(--ink-2)}
+details.sub>summary::-webkit-details-marker{display:none}
+details.sub>summary::before{content:"▸";font-size:.7rem;color:var(--ink-3);margin-right:2px;transition:transform .15s}
+details.sub[open]>summary::before{transform:rotate(90deg)}
+details.sub .sub-l{flex:1;min-width:0}
+details.sub .sub-r{display:flex;gap:6px;align-items:center}
+.sub-body{display:flex;flex-direction:column;gap:6px;padding:0 10px 10px}
+.sub-body .ctl{margin:0 -6px}
+.ctl.feat-off{opacity:.5}
+@media (prefers-reduced-motion:reduce){details.sub>summary::before{transition:none}}
 .changes{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--ink-2);max-width:90ch}
 </style>
 
@@ -371,7 +373,7 @@ table.ho td.pos{color:var(--good)}
     <div class="rail-head">
       <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>Inputs</h3><span class="note" id="railnote">Every input in the workbook</span></div>
       <div class="legend"><span class="tag src">Sourced</span><span class="tag ph">Placeholder</span><span class="tag ch">Team choice</span><span class="tag ny">Not yet modeled</span></div>
-      <div class="note">Yellow values are inputs. Type any value in the box, even outside the slider. The blue band is the researched range and the tick is the default. Hover or click <b>i</b> for each input's default, source and program notes. ↺ resets one input. <span class="mono">ALL</span> = every city, <span class="mono">CITY</span> = the focus city only.</div>
+      <div class="note">Yellow values are inputs. Type any value in the box, or drag a slider to its end to extend it. The blue band is the researched range and the tick is the default. Hover or click <b>i</b> for each input's default, source and program notes. ↺ resets one input. <span class="mono">ALL</span> = every city, <span class="mono">CITY</span> = the focus city only.</div>
     </div>
     <div id="controls"></div>
   </aside>
@@ -463,6 +465,15 @@ table.ho td.pos{color:var(--good)}
 
     <section class="panel">
       <div class="panel-head">
+        <div><span class="eyebrow">Add-on features and procurement · <span id="ftCity"></span></span><h2>What each add-on costs the project and saves the owner</h2></div>
+        <p>Every add-on starts switched off, so the base model still matches the workbook. Each row shows what that feature would do on its own, with the rest of your current settings. The project pays the upfront cost, which raises the developer gap. The owner keeps the monthly savings. Turn features on and set their details in the panel on the left, under "Add-on features and procurement".</p>
+      </div>
+      <div class="tblwrap" style="margin-top:0"><table id="featTbl"></table></div>
+      <p class="note" id="featNote" style="margin-top:8px"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
         <div><span class="eyebrow">Portfolio and mixed income</span><h2>A phase of buildings across cities and incomes</h2></div>
         <p>Each row is a group of buildings in one city at one owner income target. The developer gap per building doesn't change with income when a homebuyer subsidy fills the sales gap, but the buyer-side money does. Totals are checked against the caps the program documents state. The starting rows are an example only.</p>
       </div>
@@ -504,6 +515,7 @@ table.ho td.pos{color:var(--good)}
         <li><b>Appraisal basis</b> is a choice: existing 2-unit median, the $420K new-build precedent, or custom.</li>
         <li><b>Homeowner costs</b> now include energy bills and a maintenance reserve at 1% of value, plus a residual-income check against the MIT living wage and a stress test.</li>
         <li><b>Mill rates</b> are updated to FY2027 (Hartford 69.95, New Haven 39.96, Waterbury 43.34). The workbook uses 39.75 for New Haven.</li>
+        <li><b>Add-on features and procurement</b> (new, off by default): rooftop solar, battery storage, an efficiency package, two custom slots, other hard-cost line items, and a warehouse for bulk buying.</li>
         <li><b>Hartford and Waterbury</b> use New Haven's itemized site and soft costs, which are flagged, with their own AMI, rents, tax rate and sales comps.</li>
       </ul>
     </section>
@@ -565,6 +577,14 @@ const DEFAULTS={
     rate:0.065, term:30, dp:0.035, mip:0.0055, rentCredit:0.75, lenderCap:0.40, ownerCap:0.30, vac:0.07,
     ins:900, energy:160, common:55, maintPct:0.01, mitType:"2 adults (1 working), 2 children", energyThresh:0.06,
     inc:{assist:true,hb:true,hdf:true,ahp:true,htcc:true,doh:true},
+    hx:{foundation:0,appliances:0,finishes:0,access:0},
+    add:{solar:{on:false,kw:6,costW:2.68,rebateW:0,credit:0,yield:1150,rate:0.29,adder:0.0175,share:1,om:150,esc:0.03,degr:0.005,addVal:0},
+         battery:{on:false,kwh:10,costKwh:1100,incKwh:200,incCap:7500,benefitYr:300,addVal:0},
+         eff:{on:false,cost:15000,rebate:5000,savePct:0.25,addVal:0},
+         custA:{on:false,cost:5000,rebate:0,saveMo:0,addVal:0},
+         custB:{on:false,cost:5000,rebate:0,saveMo:0,addVal:0}},
+    lenderCounts:false,
+    wh:{on:false,sf:5000,rentSf:10,months:12,setup:15000,served:10,share:0.15,disc:0.10,invMonths:6,invRate:0.08},
     ny:{ phase2:{on:false,val:25000}, waiver:{on:false,val:8000}, abate:{on:false,val:0.5} }
   },
   cities:{
@@ -580,6 +600,8 @@ const bucketOf=u=>u<=2?0:(u===3?1:2);
 const BUCKET_LABEL=["2-unit","3-unit","4–6 unit"];
 function pmtFactor(r,n){ if(r===0) return 1/n; return r/(1-Math.pow(1+r,-n)); }
 function mfrOf(s){return s.mfr[s.method]||s.mfr["Modular - Reframe"];}
+function hhF(s,n){n=Math.max(1,Math.round(n));return n<=6?s.hhFactor[n-1]:s.hhFactor[5]+0.08*(n-6);}
+function solarLife(a,years){let t=0;const prod=a.kw*a.yield;for(let y=0;y<years;y++){t+=prod*Math.pow(1-a.degr,y)*(a.rate*Math.pow(1+a.esc,y)+a.adder)*a.share-a.om;}return t;}
 
 function compute(S,city,amiOverride){
   const s=S.shared, c=S.cities[city], ny=s.ny, inc=s.inc, R={};
@@ -594,8 +616,33 @@ function compute(S,city,amiOverride){
   R.bldg=mod?(R.facPSF+R.fieldPSF)*R.gsf+R.trans:s.stick*R.gsf;
   R.phase2=ny.phase2.on?ny.phase2.val:0;
   R.site=s.clearing+s.utilities+s.landscape+s.fence+R.phase2;
-  R.hardContC=(R.bldg+R.site)*s.hardCont;
-  R.construction=R.bldg+R.site+R.hardContC;
+  // add-on features (each off by default)
+  const A=s.add, hx=s.hx;
+  R.hx=hx.foundation+hx.appliances+hx.finishes+hx.access;
+  const sol=A.solar, bat=A.battery, eff=A.eff, ca=A.custA, cb=A.custB;
+  R.fSolarCost=sol.on?sol.kw*1000*(sol.costW-sol.rebateW)*(1-sol.credit):0;
+  R.fSolarSave=sol.on?(sol.kw*sol.yield*(sol.rate+sol.adder)*sol.share-sol.om)/12:0;
+  R.fBatCost=bat.on?Math.max(0,bat.kwh*bat.costKwh-Math.min(bat.kwh*bat.incKwh,bat.incCap)):0;
+  R.fBatSave=bat.on?bat.benefitYr/12:0;
+  R.fEffCost=eff.on?eff.cost-eff.rebate:0;
+  R.fEffSave=eff.on?s.energy*eff.savePct:0;
+  R.fCaCost=ca.on?ca.cost-ca.rebate:0; R.fCaSave=ca.on?ca.saveMo:0;
+  R.fCbCost=cb.on?cb.cost-cb.rebate:0; R.fCbSave=cb.on?cb.saveMo:0;
+  R.featCost=R.fSolarCost+R.fBatCost+R.fEffCost+R.fCaCost+R.fCbCost;
+  R.featSaveMo=R.fSolarSave+R.fBatSave+R.fEffSave+R.fCaSave+R.fCbSave;
+  R.featVal=(sol.on?sol.addVal:0)+(bat.on?bat.addVal:0)+(eff.on?eff.addVal:0)+(ca.on?ca.addVal:0)+(cb.on?cb.addVal:0);
+  // warehouse and bulk purchasing
+  const w=s.wh;
+  R.whEligible=(R.bldg+R.featCost+R.hx)*w.share;
+  R.whFixed=w.sf*w.rentSf*w.months/12+w.setup;
+  R.whPerBldg=R.whFixed/Math.max(1,w.served);
+  R.whSave=R.whEligible*w.disc;
+  R.whCarry=R.whEligible*(1-w.disc)*w.invRate*w.invMonths/12;
+  R.whBreakEven=(R.whSave-R.whCarry)>0?R.whFixed/(R.whSave-R.whCarry):null;
+  R.whNet=w.on?R.whPerBldg+R.whCarry-R.whSave:0;
+  const hardBase=R.bldg+R.featCost+R.hx+R.whNet+R.site;
+  R.hardContC=hardBase*s.hardCont;
+  R.construction=hardBase+R.hardContC;
   // B. soft, financing, land, fee
   R.waiver=ny.waiver.on?Math.min(ny.waiver.val,s.permits):0;
   const softBase=s.architect+s.engineering+s.surveys+s.phase1+(s.permits-R.waiver)+s.risk+s.legal+s.apprInsp+s.marketing+s.coord;
@@ -606,17 +653,21 @@ function compute(S,city,amiOverride){
   R.preFee=R.construction+R.soft+R.interest+R.carry+R.land;
   R.feeC=R.preFee*s.fee; R.tdc=R.preFee+R.feeC; R.tdcUnit=R.tdc/s.units; R.tdcPSF=R.tdc/R.gsf;
   // buyer
-  R.ami100=2*c.ami50; R.income=R.ami100*s.hhFactor[s.hhSize-1]*ami;
+  R.ami100=2*c.ami50; R.income=R.ami100*hhF(s,s.hhSize)*ami;
   R.rentNet=R.ami100*s.brFactor[ri]*s.rentAMI*0.3/12-s.ua[ri]; R.market=c.mkt[ri];
   R.rent= s.rentAMI===0?R.market:(s.capMkt?Math.min(R.rentNet,R.market):R.rentNet);
   R.rentBinding= s.rentAMI===0?"Market rent":(s.capMkt&&R.market<R.rentNet?"Market rent":"AMI limit");
   R.grossRent=R.rent*rented; R.collected=R.grossRent*(1-s.vac); R.lenderRentM=R.grossRent*s.rentCredit;
-  R.fmv= s.basis==="prec"?c.prec:s.basis==="custom"?c.custom:c.med[b];
+  R.fmvBase= s.basis==="prec"?c.prec:s.basis==="custom"?c.custom:c.med[b];
+  R.fmv=R.fmvBase+R.featVal;
   R.taxFull=R.fmv*c.mill*c.assess/1000/12; R.tax=R.taxFull*(1-(ny.abate.on?ny.abate.val:0));
   R.insM=s.ins*s.units/12; R.commonM=s.common*s.units; R.energyM=s.energy; R.maintM=s.maintPct*R.fmv/12;
-  R.opex=R.tax+R.insM+R.commonM+R.energyM+R.maintM;
+  R.opexGross=R.tax+R.insM+R.commonM+R.energyM+R.maintM;
+  R.opex=R.opexGross-R.featSaveMo;
+  R.opexL=s.lenderCounts?R.opex:R.opexGross;
+  R.energyNet=Math.max(0,s.energy-R.featSaveMo);
   R.k=pmtFactor(s.rate/12,s.term*12)+s.mip/12;
-  R.testA=((R.income/12+R.lenderRentM)*s.lenderCap-R.opex)/R.k/(1-s.dp);
+  R.testA=((R.income/12+R.lenderRentM)*s.lenderCap-R.opexL)/R.k/(1-s.dp);
   R.testB=(R.income/12*s.ownerCap+R.collected-R.opex)/R.k/(1-s.dp);
   R.capacity=Math.max(0,Math.min(R.testA,R.testB));
   R.capBinding=R.testA<=R.testB?"lender test":"owner test";
@@ -636,12 +687,13 @@ function compute(S,city,amiOverride){
   R.buyerPays=R.proceeds-R.tto-R.hb;
   R.mortgage=R.financed*(1-s.dp); R.down=R.financed*s.dp;
   R.pi=R.mortgage*R.k; R.ownTotal=R.pi+R.opex; R.net=R.ownTotal-R.collected;
-  R.netPct=R.net/(R.income/12); R.tenantShare=R.collected/R.ownTotal; R.energyBurden=s.energy*12/R.income;
+  R.netPct=R.net/(R.income/12); R.tenantShare=R.collected/R.ownTotal; R.energyBurden=R.energyNet*12/R.income;
   const mit=(MIT_TYPES.find(x=>x[0]===s.mitType)||MIT_TYPES[1])[1];
   R.mitNeeds=mit; R.residual=R.income-R.net*12-mit;
   R.vac3=R.grossRent*3/12; R.tax20=R.taxFull*0.2; R.repair=10000/12;
   R.stressPct=(R.net+R.vac3+R.tax20+R.repair)/(R.income/12);
   R.repairMonths=R.residual>0?10000/(R.residual/12):null;
+  R.solar25=sol.on?solarLife(sol,25):0;
   return R;
 }
 function computeAll(S){const o={};CITIES.forEach(c=>o[c]=compute(S,c));return o;}
@@ -679,6 +731,12 @@ const SRC={
  ahp:{t:"FHLBank Boston 2026 AHP notice: up to $100,000 per homeownership unit; $1,000,000 per application",u:"https://www.fhlbboston.com/?p=10990"},
  hdf:{t:"Hartford Business Journal, CT Home Funds: HDF / C4C grants up to $150,000 per home, up to 10 homes per grant",u:"https://hartfordbusiness.com/article/lamont-announces-30m-fund-to-incentivize-homeownership/"},
  htcc:{t:"CHFA HTCC 2026 round: up to $500,000 per applicant; $10M total",u:"https://www.housingonline.com/?p=74603"},
+ esCost:{t:"EnergySage, CT solar cost (2026): average $2.68/W before incentives; 12 kW systems $27K–$37K",u:"https://www.energysage.com/local-data/solar-panel-cost/ct/"},
+ es25d:{t:"EnergySage: the 25D homeowner solar credit ended Dec 31, 2025; 48E remains for leased/third-party systems placed in service before 2028",u:"https://www.energysage.com/news/congress-passes-bill-ending-residential-solar-tax-credit/?rc=p-tcd-w"},
+ rres:{t:"Eversource RRES: 20-year Netting (retail rate) or Buy-All tariff; adders for income ≤60% SMI and distressed communities",u:"https://www.eversource.com/rres"},
+ esRate:{t:"EnergySage, CT electricity cost: average about 29¢/kWh; Eversource standard service about 24¢/kWh",u:"https://www.energysage.com/local-data/electricity-cost/ct/"},
+ ess:{t:"Solar Builder (2022): CT Energy Storage Solutions residential upfront incentive about $200/kWh, capped at $7,500; runs through 2030",u:"https://solarbuildermag.com/news/connecticut-launches-statewide-battery-storage-incentive-program/"},
+ whRent:{t:"CommercialCafe, New Haven-area industrial listings (2026): asking rents about $5–$16.50 per sq ft per year",u:"https://www.commercialcafe.com/industrial/us/ct/new-haven/"},
  nhra:{t:"NHRA modular education deck (Jun 2025): 20% cost-savings target; case study $270/sf modular vs $353/sf conventional",u:"https://www.housingonline.com/wp-content/uploads/2025/06/Modular-Education-NHRA-June-2025.pdf"}
 };
 const KIND={src:"Sourced range",pub:"Published value",pol:"Program limit",ch:"Team choice",prov:"Provisional: no source yet",crs:"Course budget figure"};
@@ -742,6 +800,43 @@ const RANGES={
  dohCap:()=>({lo:230000,hi:314500,kind:"crs",src:["course","doh"],note:"The redacted New Haven DOH application shows $230K–$314.5K per home. DOH sizes awards to the gap."}),
  units:()=>({lo:2,hi:6,kind:"ch",src:[],note:"Team choice.",notes:[["If DOH funds are used","DOH's initiative excludes structures of three or more units (outline p. 4).","doh"]]}),
  hhSize:()=>({lo:1,hi:6,kind:"ch",src:[],note:""}),
+ hxFound:()=>({lo:0,hi:25000,kind:"ch",src:[],note:"$0 until the design team has a figure."}),
+ hxAppl:()=>({lo:0,hi:15000,kind:"ch",src:[],note:"$0 until the design team has a figure."}),
+ hxFin:()=>({lo:0,hi:25000,kind:"ch",src:[],note:"$0 until the design team has a figure."}),
+ hxAcc:()=>({lo:0,hi:15000,kind:"ch",src:[],note:"$0 until the design team has a figure."}),
+ solarKw:()=>({lo:3,hi:10,kind:"ch",src:[],note:"What fits on a duplex roof. Confirm with the design team."}),
+ solarCostW:()=>({lo:2.28,hi:3.08,kind:"src",src:["esCost"],note:"CT installs average $2.68/W before incentives. Builder-installed on new construction may run lower."}),
+ solarRebateW:()=>({lo:0,hi:0.5,kind:"prov",src:[],note:"No upfront CT rebate found; RRES pays over time instead. Use this for any local rebate."}),
+ solarCredit:()=>({lo:0,hi:0.3,kind:"pol",src:["es25d"],note:"The homeowner credit (25D) ended Dec 31, 2025. A 30% credit (48E) remains only for leased or third-party-owned systems placed in service before 2028."}),
+ solarYield:()=>({lo:1050,hi:1250,kind:"prov",src:[],note:"Typical CT output per kW. Check each site in NREL PVWatts."}),
+ solarRate:()=>({lo:0.21,hi:0.30,kind:"src",src:["esRate","rres"],note:"Under RRES Netting, solar is credited at the retail rate: about 24¢ standard service, about 29¢ state average."}),
+ solarAdder:()=>({lo:0,hi:0.055,kind:"pol",src:["rres"],note:"RRES adders per kWh: $0.035 (Netting) or $0.055 (Buy-All) for income at or below 60% of state median; $0.0175 / $0.0275 in distressed communities. Only one adder applies."}),
+ solarShare:()=>({lo:0.5,hi:1,kind:"ch",src:[],note:"Share of the value that reaches the owner. Less than 100% if part of the system serves the rental unit or common meter."}),
+ solarOm:()=>({lo:0,hi:300,kind:"prov",src:[],note:"Annual upkeep and inverter reserve."}),
+ solarEsc:()=>({lo:0,hi:0.05,kind:"prov",src:[],note:"Yearly rise in electricity prices, used for the 25-year savings."}),
+ solarDegr:()=>({lo:0.003,hi:0.008,kind:"prov",src:[],note:"Yearly panel output loss."}),
+ solarVal:()=>({lo:0,hi:20000,kind:"prov",src:[],note:"$0 by default. Appraisers may or may not credit owned solar."}),
+ batKwh:()=>({lo:5,hi:15,kind:"ch",src:[],note:"Battery size per building."}),
+ batCost:()=>({lo:800,hi:1400,kind:"prov",src:[],note:"Installed cost per kWh. Get quotes."}),
+ batInc:()=>({lo:0,hi:400,kind:"src",src:["ess"],note:"About $200/kWh at the program's 2022 launch, with higher rates for low-income and underserved customers. Check current rates."}),
+ batCap:()=>({lo:7500,hi:7500,kind:"pol",src:["ess"],note:"Residential cap per project at launch."}),
+ batBenefit:()=>({lo:0,hi:600,kind:"prov",src:["ess"],note:"Performance payments and bill savings to the owner per year. No CT figure yet."}),
+ batVal:()=>({lo:0,hi:10000,kind:"prov",src:[],note:"$0 by default."}),
+ effCost:()=>({lo:5000,hi:30000,kind:"prov",src:[],note:"Extra cost of an efficiency / heat-pump package over the base design. Get a design-team estimate."}),
+ effRebate:()=>({lo:0,hi:10000,kind:"prov",src:[],note:"Energize CT new-construction or heat-pump incentives. Confirm current amounts."}),
+ effSave:()=>({lo:0.1,hi:0.4,kind:"prov",src:[],note:"Cut in the owner's energy bill."}),
+ effVal:()=>({lo:0,hi:10000,kind:"prov",src:[],note:"$0 by default."}),
+ custACost:()=>({lo:0,hi:50000,kind:"ch",src:[],note:"Any feature the team wants to test."}), custARebate:()=>({lo:0,hi:25000,kind:"ch",src:[],note:""}), custASave:()=>({lo:0,hi:300,kind:"ch",src:[],note:"Owner savings per month."}), custAVal:()=>({lo:0,hi:20000,kind:"ch",src:[],note:""}),
+ custBCost:()=>({lo:0,hi:50000,kind:"ch",src:[],note:"Any feature the team wants to test."}), custBRebate:()=>({lo:0,hi:25000,kind:"ch",src:[],note:""}), custBSave:()=>({lo:0,hi:300,kind:"ch",src:[],note:"Owner savings per month."}), custBVal:()=>({lo:0,hi:20000,kind:"ch",src:[],note:""}),
+ whSf:()=>({lo:2000,hi:20000,kind:"ch",src:[],note:"Enough space to stage parts for the order."}),
+ whRent:()=>({lo:5,hi:16.5,kind:"src",src:["whRent"],note:"New Haven-area industrial asking rents, per sq ft per year."}),
+ whMonths:()=>({lo:6,hi:24,kind:"ch",src:[],note:"How long the lease runs."}),
+ whSetup:()=>({lo:5000,hi:30000,kind:"prov",src:[],note:"Racking, handling, insurance, security and trucking to sites."}),
+ whServed:()=>({lo:5,hi:50,kind:"ch",src:[],note:"Buildings that share the warehouse. Usually the order volume."}),
+ whShare:()=>({lo:0.05,hi:0.3,kind:"prov",src:[],note:"Share of hard cost the team could buy in bulk: field materials, appliances, fixtures, solar. Modular factories buy most building materials themselves."}),
+ whDisc:()=>({lo:0.05,hi:0.15,kind:"prov",src:[],note:"Bulk discount on those purchases. Needs supplier quotes."}),
+ whInvMonths:()=>({lo:3,hi:12,kind:"prov",src:[],note:"How long materials sit before installation. Feedback: funding arrives after permits, which limits buying ahead."}),
+ whInvRate:()=>({lo:0.065,hi:0.08,kind:"crs",src:["course"],note:"Cost of the money tied up in inventory, e.g., a CDFI procurement line."}),
  phase2:()=>({lo:0,hi:75000,kind:"prov",src:[],note:"No source yet. Lot-by-lot after the Phase I."}),
  waiver:()=>({lo:0,hi:15000,kind:"prov",src:[],note:"No source yet. Ask each city about waivers for affordable homeownership."}),
  abate:()=>({lo:0,hi:.5,kind:"prov",src:[],note:"No source yet. Check each city's abatement ordinance."})
@@ -789,9 +884,12 @@ const GLOSS={
  modular:["Factory and field cost","Factory cost covers the modules built off-site; field cost covers foundation, setting and finishes on site."],
  transport:["Transport, crane and set","Trucking the modules and craning them onto the foundation."],
  phase1:["Phase I ESA","A records-and-site review for contamination that lenders usually require. Phase II testing and remediation are extra."],
+ solar:["Rooftop solar","Panels on the building. The project pays to install them; the owner gets the bill credits for 20 years through RRES."],
+ rres:["RRES","Residential Renewable Energy Solutions: CT's 20-year solar tariff run by Eversource and UI. Netting credits solar at the retail rate."],
+ wh:["Warehouse and bulk buying","Leasing space to buy and stage parts for many buildings at once. It pays when the bulk discount beats the rent, handling and the cost of money tied up in inventory."],
  cama:["CAMA data","The state's property assessment records, including recorded sale prices."]
 };
-const TERM_RE=[["Owner's net monthly","net"],["net monthly cost","net"],["Remaining developer gap","remain"],["Developer gap","devGap"],["developer gap","devGap"],["Sales gap","salesGap"],["sales gap","salesGap"],["Sale proceeds","proceeds"],["Appraised value","fmv"],["Affordable price","afford"],["Buyer capacity","capacity"],["homebuyer subsidy","hb"],["AMI","AMI"],["income limit","incomeLimit"],["Test A","testA"],["Test B","testB"],["TDC","tdc"],["Total development cost","tdc"],["Construction cost","construction"],["Construction loan","interest"],["Developer fee","fee"],["Order volume","volume"],["learning","learn"],["Soft","soft"],["contingency","cont"],["GSF","gsf"],["Gross-up","grossup"],["Mill rate","mill"],["utility allowance","ua"],["MIP","mip"],["credit on rental","rentCredit"],["Vacancy","vac"],["Phase I","phase1"],["DOH","doh"],["HDF","hdf"],["AHP","ahp"],["HTCC","htcc"],["Time To Own","tto"],["Factory","modular"],["Field cost","modular"],["Transport","transport"],["living","mit"],["Energy burden","energyB"],["Residual","residual"]];
+const TERM_RE=[["Owner's net monthly","net"],["net monthly cost","net"],["Remaining developer gap","remain"],["Developer gap","devGap"],["developer gap","devGap"],["Sales gap","salesGap"],["sales gap","salesGap"],["Sale proceeds","proceeds"],["Appraised value","fmv"],["Affordable price","afford"],["Buyer capacity","capacity"],["homebuyer subsidy","hb"],["AMI","AMI"],["income limit","incomeLimit"],["Test A","testA"],["Test B","testB"],["TDC","tdc"],["Total development cost","tdc"],["Construction cost","construction"],["Construction loan","interest"],["Developer fee","fee"],["Order volume","volume"],["learning","learn"],["Soft","soft"],["contingency","cont"],["GSF","gsf"],["Gross-up","grossup"],["Mill rate","mill"],["utility allowance","ua"],["MIP","mip"],["credit on rental","rentCredit"],["Vacancy","vac"],["Phase I","phase1"],["DOH","doh"],["HDF","hdf"],["AHP","ahp"],["HTCC","htcc"],["Time To Own","tto"],["Factory","modular"],["Field cost","modular"],["Transport","transport"],["living","mit"],["Energy burden","energyB"],["Residual","residual"],["solar","solar"],["RRES","rres"],["warehouse","wh"],["bulk","wh"]];
 function termOf(text){for(const [w,k] of TERM_RE){if(text.toLowerCase().includes(w.toLowerCase()))return k;}return null;}
 function termWrap(text){for(const [w,k] of TERM_RE){const i=text.toLowerCase().indexOf(w.toLowerCase());if(i>=0){return esc(text.slice(0,i))+`<span class="term" tabindex="0" data-term="${k}">${esc(text.slice(i,i+w.length))}</span>`+esc(text.slice(i+w.length));}}return esc(text);}
 function esc(s){return String(s).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));}
@@ -821,26 +919,34 @@ const SH=k=>({get:(St)=>St.shared[k],set:(St,c,v)=>{St.shared[k]=v;}});
 const SHA=(k,idxFn)=>({get:(St)=>St.shared[k][idxFn(St)],set:(St,c,v)=>{St.shared[k][idxFn(St)]=v;}});
 const CT=(k,idxFn)=>({get:(St,c)=>idxFn?St.cities[c][k][idxFn(St)]:St.cities[c][k],set:(St,c,v)=>{if(idxFn)St.cities[c][k][idxFn(St)]=v;else St.cities[c][k]=v;}});
 const MF=fld=>({get:(St)=>St.shared.mfr[mfrKey(St)][fld],set:(St,c,v)=>{St.shared.mfr[mfrKey(St)][fld]=v;}});
+const AD=(f,fld)=>({get:(St)=>St.shared.add[f][fld],set:(St,c,v)=>{St.shared.add[f][fld]=v;}});
+const HX=fld=>({get:(St)=>St.shared.hx[fld],set:(St,c,v)=>{St.shared.hx[fld]=v;}});
+const WH=fld=>({get:(St)=>St.shared.wh[fld],set:(St,c,v)=>{St.shared.wh[fld]=v;}});
 const NY=k=>({get:(St)=>St.shared.ny[k].val,set:(St,c,v)=>{St.shared.ny[k].val=v;},on:(St)=>St.shared.ny[k].on,toggle:(St,c,v)=>{St.shared.ny[k].on=v;}});
 const BASIS_SEL={get:(St)=>BASIS.find(b=>b[0]===St.shared.basis)[1],set:(St,c,v)=>{St.shared.basis=(BASIS.find(b=>b[1]===v)||BASIS[0])[0];}};
 const ri=St=>BR.indexOf(St.shared.rentBR), oi=St=>BR.indexOf(St.shared.ownerBR), bk=St=>bucketOf(St.shared.units);
 const bOf=()=>bucketOf(S.shared.units);
 const mName=()=>mfrKey(S).replace("Modular - ","");
 
-const GROUPS=[{id:"scn",label:"Building and household"},{id:"city",label:"City data"},{id:"fin",label:"Buyer financing"},{id:"own",label:"Owner operating costs"},{id:"value",label:"Appraisal and buyer-side money"},{id:"method",label:"Construction method and order volume"},{id:"site",label:"Site work and hard-cost contingency"},{id:"soft",label:"Soft costs, loan and developer fee"},{id:"stack",label:"Developer-side money"},{id:"ny",label:"Not yet modeled"}];
+const GROUPS=[{id:"scn",label:"Building and household"},{id:"city",label:"City data",subs:[["comps","Sales comps and appraisal values"]]},{id:"fin",label:"Buyer financing"},{id:"own",label:"Owner operating costs"},{id:"value",label:"Appraisal and buyer-side money"},
+ {id:"method",label:"Construction: building",subs:[["mfr","Manufacturer and order volume"],["stick","Stick-built benchmark"],["size","Building size"],["hx","Other hard-cost line items"]]},
+ {id:"site",label:"Construction: site work",subs:[["work","Site work items"],["hcont","Hard-cost contingency"]]},
+ {id:"soft",label:"Soft costs, loan and fee",subs:[["design","Design and engineering"],["envp","Environmental and permits"],["ilm","Insurance, legal and sales"],["scont","Soft-cost contingency"],["loan","Construction loan and carry"],["fee","Developer fee"]]},
+ {id:"feat",label:"Add-on features and procurement",subs:[["solar","Rooftop solar","solarOn"],["battery","Battery storage","batOn"],["eff","Efficiency / heat-pump package","effOn"],["custA","Custom add-on A","custAOn"],["custB","Custom add-on B","custBOn"],["lend","How lenders treat savings"],["wh","Warehouse and bulk buying","whOn"]]},
+ {id:"stack",label:"Developer-side money"},{id:"ny",label:"Not yet modeled"}];
 const CTRL=[
- {k:"units",g:"scn",label:"Total units in the building",type:"range",min:2,max:6,step:1,fmt:"num",conf:"ch",node:"i_prog",...SH("units"),why:"The team's proposal is a duplex: one owner unit plus one rental."},
+ {k:"units",g:"scn",label:"Total units in the building",type:"range",min:1,max:6,floor:1,step:1,fmt:"num",conf:"ch",node:"i_prog",...SH("units"),why:"The team's proposal is a duplex: one owner unit plus one rental."},
  {k:"ownerBR",g:"scn",label:"Owner unit bedrooms",type:"select",opts:BR,conf:"ch",node:"i_prog",...SH("ownerBR"),why:"Team choice: a family-sized home."},
  {k:"rentBR",g:"scn",label:"Rental unit bedrooms",type:"select",opts:BR,conf:"ch",node:"i_rentT",...SH("rentBR"),why:"Team choice. Sets the rent limit, utility allowance, market rent and unit size."},
  {k:"ownerAMI",g:"scn",label:"Owner household income target",type:"range",step:0.01,fmt:"pct",conf:"ch",node:"i_hh",...SH("ownerAMI"),why:"80% AMI, the consensus in the room at External Review 1."},
- {k:"hhSize",g:"scn",label:"Owner household size",type:"range",min:1,max:6,step:1,fmt:"num",conf:"ch",node:"i_hh",...SH("hhSize"),why:"A 4-person household, HUD's reference size."},
+ {k:"hhSize",g:"scn",label:"Owner household size",type:"range",min:1,max:8,floor:1,step:1,fmt:"num",conf:"ch",node:"i_hh",...SH("hhSize"),why:"A 4-person household, HUD's reference size."},
  {k:"rentAMI",g:"scn",label:"Rental unit rent target",type:"range",step:0.01,fmt:"pct",conf:"ch",node:"i_rentT",...SH("rentAMI"),why:"Team choice: rent the second unit at 60% AMI. Set it to 0% for market rent."},
  {k:"capMkt",g:"scn",label:"Cap the AMI rent at market rent",type:"check",conf:"ch",node:"i_rentT",...SH("capMkt"),why:"An owner can't charge more than the market will pay. The workbook always caps."},
  {k:"ami50",g:"city",label:"HUD 50% income limit, 4-person",type:"range",step:50,fmt:"usd",conf:"src",node:"i_ami",...CT("ami50"),why:"HUD FY2026 Section 8 income limits. The model uses twice this as 100% AMI."},
  {k:"mkt",g:"city",label:()=>"Market asking rent, "+S.shared.rentBR,type:"range",step:5,fmt:"usd",conf:"src",node:"i_mkt",...CT("mkt",ri),why:"New Haven: Zillow, Sept 2026. Hartford and Waterbury: Redfin, Aug 2026."},
- {k:"med",g:"city",label:()=>"Median sale, existing "+BUCKET_LABEL[bOf()],type:"range",step:1000,fmt:"usd",conf:"src",node:"i_appr",...CT("med",bk),why:"CT CAMA recorded sales of existing buildings, 2023–26. Not Zillow or Redfin."},
- {k:"prec",g:"city",label:"New-build appraisal precedent",type:"range",step:1000,fmt:"usd",conf:"src",node:"i_appr",...CT("prec"),why:"New Haven DOH application (redacted): a new 2,800 sq ft two-family at $420K. Applied to all three cities until each has its own precedent."},
- {k:"custom",g:"city",label:"Custom appraisal",type:"range",step:1000,fmt:"usd",conf:"ch",node:"i_appr",...CT("custom"),why:"Use for an appraiser's opinion once you have one."},
+ {k:"med",sub:"comps",g:"city",label:()=>"Median sale, existing "+BUCKET_LABEL[bOf()],type:"range",step:1000,fmt:"usd",conf:"src",node:"i_appr",...CT("med",bk),why:"CT CAMA recorded sales of existing buildings, 2023–26. Not Zillow or Redfin."},
+ {k:"prec",sub:"comps",g:"city",label:"New-build appraisal precedent",type:"range",step:1000,fmt:"usd",conf:"src",node:"i_appr",...CT("prec"),why:"New Haven DOH application (redacted): a new 2,800 sq ft two-family at $420K. Applied to all three cities until each has its own precedent."},
+ {k:"custom",sub:"comps",g:"city",label:"Custom appraisal",type:"range",step:1000,fmt:"usd",conf:"ch",node:"i_appr",...CT("custom"),why:"Use for an appraiser's opinion once you have one."},
  {k:"mill",g:"city",label:"Mill rate",type:"range",step:0.01,fmt:"mill",conf:"src",node:"i_mill",...CT("mill"),why:"FY2027 rate from the CCM municipal profiles. The team workbook still uses 39.75 for New Haven."},
  {k:"land",g:"city",label:"Land acquisition and closing ($/building)",type:"range",step:100,fmt:"usd",conf:"ph",node:"i_land",...CT("land"),why:"The New Haven Land Bank conveys city lots for $1; closing is a placeholder. Applied to every city."},
  {k:"rate",g:"fin",label:"Mortgage rate",type:"range",step:0.00005,fmt:"pct3",conf:"ph",node:"i_mort",...SH("rate"),why:"Workbook placeholder: CHFA/FHA 30-year."},
@@ -861,38 +967,88 @@ const CTRL=[
  {k:"useHB",g:"value",label:"Fill the sales gap with a DOH homebuyer subsidy",type:"check",conf:"ch",node:"i_bsub",...SH("useHB"),why:"The redacted DOH application funds two subsidies: developer (TDC − FMV) and homebuyer (FMV − affordable price)."},
  {k:"tto",g:"value",label:"CHFA Time To Own, max per buyer",type:"range",step:250,fmt:"usd",conf:"src",node:"i_bsub",...SH("tto"),why:"Buyer-side only: raises what the buyer can pay, never used against the developer gap."},
  {k:"otherAssist",g:"value",label:"Other buyer assistance (e.g., Equity Builder)",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_bsub",...SH("otherAssist"),why:"Not in the workbook; off by default. Buyer-side only."},
- {k:"method",g:"method",label:"Construction method",type:"select",opts:METHODS,conf:"ch",node:"i_method",...SH("method"),why:"Workbook default: Reframe. Manufacturer costs are faculty placeholders."},
- {k:"volume",g:"method",label:"Order volume (buildings ordered together)",type:"range",min:1,max:100,step:1,fmt:"num",conf:"ch",node:"i_method",...SH("volume"),why:"10 buildings, the phase the team is planning."},
- {k:"factory",g:"method",rk:"factory",label:()=>`Factory cost at volume 1, $/GSF (${mName()})`,type:"range",step:0.5,fmt:"psf",conf:"ph",node:"i_method",...MF("f"),why:"Workshop model Volume Curve tab (faculty placeholder)."},
- {k:"field",g:"method",label:()=>`Field cost at volume 1, $/GSF (${mName()})`,type:"range",step:0.5,fmt:"psf",conf:"ph",node:"i_method",...MF("d"),why:"Foundation, set, tie-ins and finishes."},
- {k:"transport",g:"method",label:()=>`Transport, crane and set at volume 1 (${mName()})`,type:"range",step:250,fmt:"usd",conf:"ph",node:"i_method",...MF("t"),why:"Per building."},
- {k:"learn",g:"method",rk:"learn",label:()=>`Factory learning rate per doubling (${mName()})`,type:"range",step:0.005,fmt:"pct1",conf:"ph",node:"i_method",...MF("lf"),why:"How much factory cost falls each time the order doubles."},
- {k:"stick",g:"method",label:"Stick-built hard cost, $/GSF",type:"range",step:1,fmt:"psf",conf:"src",node:"i_method",...SH("stick"),why:"Recalibrated to partner feedback: ~$800K all-in for a Hartford two-family. The old deck used $285, which partners flagged as inflated."},
- {k:"ownerSF",g:"method",label:()=>"Net sq ft, owner unit ("+S.shared.ownerBR+")",type:"range",step:10,fmt:"num",conf:"ch",node:"i_prog",...SHA("sqft",oi),why:"Course calculator default; architecture team to confirm."},
- {k:"rentSF",g:"method",label:()=>"Net sq ft, rental unit ("+S.shared.rentBR+")",type:"range",step:10,fmt:"num",conf:"ch",node:"i_prog",...SHA("sqft",ri),why:"Course calculator default."},
- {k:"grossup",g:"method",label:"Gross-up, net to gross sq ft",type:"range",step:0.01,fmt:"x",conf:"ch",node:"i_prog",...SH("grossup"),why:"Walls, stairs, mechanical."},
- {k:"clearing",g:"site",label:"Site clearing / demolition",type:"range",step:250,fmt:"usd",conf:"src",node:"i_site",...SH("clearing"),why:"Redacted New Haven infill budget: $2,500 per unit."},
- {k:"utilities",g:"site",label:"Street utilities and connections",type:"range",step:500,fmt:"usd",conf:"src",node:"i_site",...SH("utilities"),why:"Redacted infill budget: $15,000 per unit × 2."},
- {k:"landscape",g:"site",label:"Landscaping, driveway, walks",type:"range",step:500,fmt:"usd",conf:"src",node:"i_site",...SH("landscape"),why:"Redacted infill budget."},
- {k:"fence",g:"site",label:"Fencing and security",type:"range",step:500,fmt:"usd",conf:"src",node:"i_site",...SH("fence"),why:"Redacted infill budget."},
- {k:"hardCont",g:"site",label:"Hard-cost contingency",type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_site",...SH("hardCont"),why:"Redacted homeownership budget: 10%."},
- {k:"architect",g:"soft",label:"Architect",type:"range",step:500,fmt:"usd",conf:"src",node:"i_softs",...SH("architect"),why:"Redacted infill: $6,000 per unit."},
- {k:"engineering",g:"soft",label:"Engineering (civil, structural, MEP, geotech)",type:"range",step:500,fmt:"usd",conf:"src",node:"i_softs",...SH("engineering"),why:"Redacted infill: $5,000 per unit."},
- {k:"surveys",g:"soft",label:"Surveys",type:"range",step:250,fmt:"usd",conf:"src",node:"i_softs",...SH("surveys"),why:"Redacted infill: $2,250 per unit."},
- {k:"phase1",g:"soft",label:"Environmental: Phase I ESA",type:"range",step:100,fmt:"usd",conf:"src",node:"i_softs",...SH("phase1"),why:"Lenders usually require one. Phase II and remediation are not included."},
- {k:"permits",g:"soft",label:"Building permits and development fees",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_softs",...SH("permits"),why:"Redacted infill figure. Placeholder: confirm with each city."},
- {k:"risk",g:"soft",label:"Builder's risk insurance / bond",type:"range",step:500,fmt:"usd",conf:"src",node:"i_softs",...SH("risk"),why:"Redacted infill: $12,500."},
- {k:"legal",g:"soft",label:"Legal: real estate, closing, title",type:"range",step:100,fmt:"usd",conf:"src",node:"i_softs",...SH("legal"),why:"Redacted homeownership budget: $5,000 legal + $2,300 lender counsel."},
- {k:"apprInsp",g:"soft",label:"Appraisal and construction inspections",type:"range",step:50,fmt:"usd",conf:"src",node:"i_softs",...SH("apprInsp"),why:"Redacted homeownership budget: $750 + $2,700."},
- {k:"marketing",g:"soft",label:"Marketing and buyer intake",type:"range",step:250,fmt:"usd",conf:"src",node:"i_softs",...SH("marketing"),why:"Redacted homeownership budget."},
- {k:"coord",g:"soft",label:"Project coordination / predevelopment staff",type:"range",step:250,fmt:"usd",conf:"src",node:"i_softs",...SH("coord"),why:"Redacted homeownership budget."},
- {k:"softCont",g:"soft",label:"Soft-cost contingency",type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_softs",...SH("softCont"),why:"Redacted homeownership budget: 5%."},
- {k:"carry",g:"soft",label:"Property tax and insurance during construction",type:"range",step:100,fmt:"usd",conf:"ph",node:"i_loan",...SH("carry"),why:"Workbook placeholder."},
- {k:"loanRate",g:"soft",label:"Construction loan rate",type:"range",step:0.0025,fmt:"pct2",conf:"ph",node:"i_loan",...SH("loanRate"),why:"Workbook placeholder; a redacted bridge loan was 6.5%."},
- {k:"draw",g:"soft",label:"Average share of costs drawn during construction",type:"range",step:0.01,fmt:"pct",conf:"ch",node:"i_loan",...SH("draw"),why:"Typical S-curve draw."},
- {k:"loanMod",g:"soft",label:"Construction-loan months, modular",type:"range",step:0.25,fmt:"dec",conf:"ph",node:"i_loan",...SH("loanMod"),why:"From the workbook schedule: site prep to closing. Durations are placeholders."},
- {k:"loanStick",g:"soft",label:"Construction-loan months, stick-built",type:"range",step:0.25,fmt:"dec",conf:"ph",node:"i_loan",...SH("loanStick"),why:"From the workbook schedule."},
- {k:"fee",g:"soft",label:"Developer fee (% of costs)",type:"range",step:0.005,fmt:"pct1",conf:"ch",node:"i_fee",...SH("fee"),why:"Reviewers: keep a fee to build capacity. The workbook uses 10%."},
+ {k:"method",sub:"mfr",g:"method",label:"Construction method",type:"select",opts:METHODS,conf:"ch",node:"i_method",...SH("method"),why:"Workbook default: Reframe. Manufacturer costs are faculty placeholders."},
+ {k:"volume",sub:"mfr",g:"method",label:"Order volume (buildings ordered together)",type:"range",min:1,max:100,floor:1,step:1,fmt:"num",conf:"ch",node:"i_method",...SH("volume"),why:"10 buildings, the phase the team is planning."},
+ {k:"factory",sub:"mfr",g:"method",rk:"factory",label:()=>`Factory cost at volume 1, $/GSF (${mName()})`,type:"range",step:0.5,fmt:"psf",conf:"ph",node:"i_method",...MF("f"),why:"Workshop model Volume Curve tab (faculty placeholder)."},
+ {k:"field",sub:"mfr",g:"method",label:()=>`Field cost at volume 1, $/GSF (${mName()})`,type:"range",step:0.5,fmt:"psf",conf:"ph",node:"i_method",...MF("d"),why:"Foundation, set, tie-ins and finishes."},
+ {k:"transport",sub:"mfr",g:"method",label:()=>`Transport, crane and set at volume 1 (${mName()})`,type:"range",step:250,fmt:"usd",conf:"ph",node:"i_method",...MF("t"),why:"Per building."},
+ {k:"learn",sub:"mfr",g:"method",rk:"learn",label:()=>`Factory learning rate per doubling (${mName()})`,type:"range",step:0.005,fmt:"pct1",conf:"ph",node:"i_method",...MF("lf"),why:"How much factory cost falls each time the order doubles."},
+ {k:"stick",sub:"stick",g:"method",label:"Stick-built hard cost, $/GSF",type:"range",step:1,fmt:"psf",conf:"src",node:"i_method",...SH("stick"),why:"Recalibrated to partner feedback: ~$800K all-in for a Hartford two-family. The old deck used $285, which partners flagged as inflated."},
+ {k:"ownerSF",sub:"size",g:"method",label:()=>"Net sq ft, owner unit ("+S.shared.ownerBR+")",type:"range",step:10,fmt:"num",conf:"ch",node:"i_prog",...SHA("sqft",oi),why:"Course calculator default; architecture team to confirm."},
+ {k:"rentSF",sub:"size",g:"method",label:()=>"Net sq ft, rental unit ("+S.shared.rentBR+")",type:"range",step:10,fmt:"num",conf:"ch",node:"i_prog",...SHA("sqft",ri),why:"Course calculator default."},
+ {k:"grossup",sub:"size",g:"method",label:"Gross-up, net to gross sq ft",type:"range",step:0.01,fmt:"x",conf:"ch",node:"i_prog",...SH("grossup"),why:"Walls, stairs, mechanical."},
+ {k:"clearing",sub:"work",g:"site",label:"Site clearing / demolition",type:"range",step:250,fmt:"usd",conf:"src",node:"i_site",...SH("clearing"),why:"Redacted New Haven infill budget: $2,500 per unit."},
+ {k:"utilities",sub:"work",g:"site",label:"Street utilities and connections",type:"range",step:500,fmt:"usd",conf:"src",node:"i_site",...SH("utilities"),why:"Redacted infill budget: $15,000 per unit × 2."},
+ {k:"landscape",sub:"work",g:"site",label:"Landscaping, driveway, walks",type:"range",step:500,fmt:"usd",conf:"src",node:"i_site",...SH("landscape"),why:"Redacted infill budget."},
+ {k:"fence",sub:"work",g:"site",label:"Fencing and security",type:"range",step:500,fmt:"usd",conf:"src",node:"i_site",...SH("fence"),why:"Redacted infill budget."},
+ {k:"hardCont",sub:"hcont",g:"site",label:"Hard-cost contingency",type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_site",...SH("hardCont"),why:"Redacted homeownership budget: 10%."},
+ {k:"architect",sub:"design",g:"soft",label:"Architect",type:"range",step:500,fmt:"usd",conf:"src",node:"i_softs",...SH("architect"),why:"Redacted infill: $6,000 per unit."},
+ {k:"engineering",sub:"design",g:"soft",label:"Engineering (civil, structural, MEP, geotech)",type:"range",step:500,fmt:"usd",conf:"src",node:"i_softs",...SH("engineering"),why:"Redacted infill: $5,000 per unit."},
+ {k:"surveys",sub:"design",g:"soft",label:"Surveys",type:"range",step:250,fmt:"usd",conf:"src",node:"i_softs",...SH("surveys"),why:"Redacted infill: $2,250 per unit."},
+ {k:"phase1",sub:"envp",g:"soft",label:"Environmental: Phase I ESA",type:"range",step:100,fmt:"usd",conf:"src",node:"i_softs",...SH("phase1"),why:"Lenders usually require one. Phase II and remediation are not included."},
+ {k:"permits",sub:"envp",g:"soft",label:"Building permits and development fees",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_softs",...SH("permits"),why:"Redacted infill figure. Placeholder: confirm with each city."},
+ {k:"risk",sub:"ilm",g:"soft",label:"Builder's risk insurance / bond",type:"range",step:500,fmt:"usd",conf:"src",node:"i_softs",...SH("risk"),why:"Redacted infill: $12,500."},
+ {k:"legal",sub:"ilm",g:"soft",label:"Legal: real estate, closing, title",type:"range",step:100,fmt:"usd",conf:"src",node:"i_softs",...SH("legal"),why:"Redacted homeownership budget: $5,000 legal + $2,300 lender counsel."},
+ {k:"apprInsp",sub:"ilm",g:"soft",label:"Appraisal and construction inspections",type:"range",step:50,fmt:"usd",conf:"src",node:"i_softs",...SH("apprInsp"),why:"Redacted homeownership budget: $750 + $2,700."},
+ {k:"marketing",sub:"ilm",g:"soft",label:"Marketing and buyer intake",type:"range",step:250,fmt:"usd",conf:"src",node:"i_softs",...SH("marketing"),why:"Redacted homeownership budget."},
+ {k:"coord",sub:"ilm",g:"soft",label:"Project coordination / predevelopment staff",type:"range",step:250,fmt:"usd",conf:"src",node:"i_softs",...SH("coord"),why:"Redacted homeownership budget."},
+ {k:"softCont",sub:"scont",g:"soft",label:"Soft-cost contingency",type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_softs",...SH("softCont"),why:"Redacted homeownership budget: 5%."},
+ {k:"carry",sub:"loan",g:"soft",label:"Property tax and insurance during construction",type:"range",step:100,fmt:"usd",conf:"ph",node:"i_loan",...SH("carry"),why:"Workbook placeholder."},
+ {k:"loanRate",sub:"loan",g:"soft",label:"Construction loan rate",type:"range",step:0.0025,fmt:"pct2",conf:"ph",node:"i_loan",...SH("loanRate"),why:"Workbook placeholder; a redacted bridge loan was 6.5%."},
+ {k:"draw",sub:"loan",g:"soft",label:"Average share of costs drawn during construction",type:"range",step:0.01,fmt:"pct",conf:"ch",node:"i_loan",...SH("draw"),why:"Typical S-curve draw."},
+ {k:"loanMod",sub:"loan",g:"soft",label:"Construction-loan months, modular",type:"range",step:0.25,fmt:"dec",conf:"ph",node:"i_loan",...SH("loanMod"),why:"From the workbook schedule: site prep to closing. Durations are placeholders."},
+ {k:"loanStick",sub:"loan",g:"soft",label:"Construction-loan months, stick-built",type:"range",step:0.25,fmt:"dec",conf:"ph",node:"i_loan",...SH("loanStick"),why:"From the workbook schedule."},
+ {k:"fee",sub:"fee",g:"soft",label:"Developer fee (% of costs)",type:"range",step:0.005,fmt:"pct1",conf:"ch",node:"i_fee",...SH("fee"),why:"Reviewers: keep a fee to build capacity. The workbook uses 10%."},
+ {k:"hxFound",sub:"hx",g:"method",label:"Foundation / soils premium",type:"range",step:500,fmt:"usd",conf:"ch",node:"i_hx",...HX("foundation"),why:"Extra foundation work for poor soils or a slope. $0 by default."},
+ {k:"hxAppl",sub:"hx",g:"method",label:"Appliance package",type:"range",step:250,fmt:"usd",conf:"ch",node:"i_hx",...HX("appliances"),why:"Appliances not in the manufacturer's price. $0 by default."},
+ {k:"hxFin",sub:"hx",g:"method",label:"Finishes upgrade",type:"range",step:500,fmt:"usd",conf:"ch",node:"i_hx",...HX("finishes"),why:"$0 by default."},
+ {k:"hxAcc",sub:"hx",g:"method",label:"Accessibility / visitability features",type:"range",step:250,fmt:"usd",conf:"ch",node:"i_hx",...HX("access"),why:"$0 by default."},
+ {k:"solarOn",sub:"solar",g:"feat",label:"Include rooftop solar",type:"check",conf:"ch",node:"i_feat",...AD("solar","on"),why:"Off by default; not in the workbook."},
+ {k:"solarKw",sub:"solar",g:"feat",label:"System size per building",type:"range",step:0.5,fmt:"kw",conf:"ch",node:"i_feat",...AD("solar","kw"),why:"A duplex roof fits roughly 5–8 kW."},
+ {k:"solarCostW",sub:"solar",g:"feat",label:"Installed cost per watt",type:"range",step:0.01,fmt:"dpw",conf:"src",node:"i_feat",...AD("solar","costW"),why:"CT average before incentives."},
+ {k:"solarRebateW",sub:"solar",g:"feat",label:"Upfront rebate per watt",type:"range",step:0.01,fmt:"dpw",conf:"ph",node:"i_feat",...AD("solar","rebateW"),why:"No statewide upfront rebate found."},
+ {k:"solarCredit",sub:"solar",g:"feat",label:"Federal tax credit (share of cost)",type:"range",step:0.01,fmt:"pct",conf:"src",node:"i_feat",...AD("solar","credit"),why:"0%: the homeowner credit ended in 2025. Set 30% only for a leased/third-party system placed in service before 2028."},
+ {k:"solarYield",sub:"solar",g:"feat",label:"Output per kW (kWh/yr)",type:"range",step:10,fmt:"num",conf:"ph",node:"i_feat",...AD("solar","yield"),why:"Typical CT output."},
+ {k:"solarRate",sub:"solar",g:"feat",label:"Value per kWh (retail rate under RRES Netting)",type:"range",step:0.005,fmt:"kwh",conf:"src",node:"i_feat",...AD("solar","rate"),why:"State average retail rate."},
+ {k:"solarAdder",sub:"solar",g:"feat",label:"RRES adder per kWh",type:"range",step:0.0025,fmt:"kwh",conf:"src",node:"i_feat",...AD("solar","adder"),why:"Distressed-community adder under Netting. Check each city on the state's distressed list."},
+ {k:"solarShare",sub:"solar",g:"feat",label:"Share of solar value to the owner",type:"range",step:0.05,fmt:"pct",conf:"ch",node:"i_feat",...AD("solar","share"),why:"100%: the system serves the owner's meter."},
+ {k:"solarOm",sub:"solar",g:"feat",label:"Upkeep and inverter reserve ($/yr)",type:"range",step:10,fmt:"usd",conf:"ph",node:"i_feat",...AD("solar","om"),why:"Placeholder."},
+ {k:"solarEsc",sub:"solar",g:"feat",label:"Electricity price rise per year",type:"range",step:0.005,fmt:"pct1",conf:"ph",node:"i_feat",...AD("solar","esc"),why:"Used for the 25-year savings only."},
+ {k:"solarDegr",sub:"solar",g:"feat",label:"Panel output loss per year",type:"range",step:0.001,fmt:"pct1",conf:"ph",node:"i_feat",...AD("solar","degr"),why:"Used for the 25-year savings only."},
+ {k:"solarVal",sub:"solar",g:"feat",label:"Added appraised value",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_feat",...AD("solar","addVal"),why:"$0 by default."},
+ {k:"batOn",sub:"battery",g:"feat",label:"Include battery storage",type:"check",conf:"ch",node:"i_feat",...AD("battery","on"),why:"Off by default."},
+ {k:"batKwh",sub:"battery",g:"feat",label:"Battery size (kWh)",type:"range",step:1,fmt:"num",conf:"ch",node:"i_feat",...AD("battery","kwh"),why:"Team choice."},
+ {k:"batCost",sub:"battery",g:"feat",label:"Installed cost per kWh",type:"range",step:25,fmt:"usd",conf:"ph",node:"i_feat",...AD("battery","costKwh"),why:"Placeholder."},
+ {k:"batInc",sub:"battery",g:"feat",label:"Energy Storage Solutions incentive per kWh",type:"range",step:10,fmt:"usd",conf:"src",node:"i_feat",...AD("battery","incKwh"),why:"Launch rate; check current."},
+ {k:"batCap",sub:"battery",g:"feat",label:"Incentive cap per project",type:"range",step:250,fmt:"usd",conf:"src",node:"i_feat",...AD("battery","incCap"),why:"Residential cap at launch."},
+ {k:"batBenefit",sub:"battery",g:"feat",label:"Owner benefit per year",type:"range",step:25,fmt:"usd",conf:"ph",node:"i_feat",...AD("battery","benefitYr"),why:"Performance payments and bill savings. Placeholder."},
+ {k:"batVal",sub:"battery",g:"feat",label:"Added appraised value",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_feat",...AD("battery","addVal"),why:"$0 by default."},
+ {k:"effOn",sub:"eff",g:"feat",label:"Include an efficiency / heat-pump package",type:"check",conf:"ch",node:"i_feat",...AD("eff","on"),why:"Off by default."},
+ {k:"effCost",sub:"eff",g:"feat",label:"Added cost per building",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_feat",...AD("eff","cost"),why:"Placeholder."},
+ {k:"effRebate",sub:"eff",g:"feat",label:"Rebates per building",type:"range",step:250,fmt:"usd",conf:"ph",node:"i_feat",...AD("eff","rebate"),why:"Placeholder."},
+ {k:"effSave",sub:"eff",g:"feat",label:"Cut in owner energy bill",type:"range",step:0.01,fmt:"pct",conf:"ph",node:"i_feat",...AD("eff","savePct"),why:"Placeholder."},
+ {k:"effVal",sub:"eff",g:"feat",label:"Added appraised value",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_feat",...AD("eff","addVal"),why:"$0 by default."},
+ {k:"custAOn",sub:"custA",g:"feat",label:"Include custom add-on A",type:"check",conf:"ch",node:"i_feat",...AD("custA","on"),why:"A blank slot for any feature."},
+ {k:"custACost",sub:"custA",g:"feat",label:"Cost per building",type:"range",step:250,fmt:"usd",conf:"ch",node:"i_feat",...AD("custA","cost"),why:"Team choice."},
+ {k:"custARebate",sub:"custA",g:"feat",label:"Rebate or grant per building",type:"range",step:250,fmt:"usd",conf:"ch",node:"i_feat",...AD("custA","rebate"),why:"Team choice."},
+ {k:"custASave",sub:"custA",g:"feat",label:"Owner savings per month",type:"range",step:5,fmt:"usd",conf:"ch",node:"i_feat",...AD("custA","saveMo"),why:"Team choice."},
+ {k:"custAVal",sub:"custA",g:"feat",label:"Added appraised value",type:"range",step:500,fmt:"usd",conf:"ch",node:"i_feat",...AD("custA","addVal"),why:"Team choice."},
+ {k:"custBOn",sub:"custB",g:"feat",label:"Include custom add-on B",type:"check",conf:"ch",node:"i_feat",...AD("custB","on"),why:"A blank slot for any feature."},
+ {k:"custBCost",sub:"custB",g:"feat",label:"Cost per building",type:"range",step:250,fmt:"usd",conf:"ch",node:"i_feat",...AD("custB","cost"),why:"Team choice."},
+ {k:"custBRebate",sub:"custB",g:"feat",label:"Rebate or grant per building",type:"range",step:250,fmt:"usd",conf:"ch",node:"i_feat",...AD("custB","rebate"),why:"Team choice."},
+ {k:"custBSave",sub:"custB",g:"feat",label:"Owner savings per month",type:"range",step:5,fmt:"usd",conf:"ch",node:"i_feat",...AD("custB","saveMo"),why:"Team choice."},
+ {k:"custBVal",sub:"custB",g:"feat",label:"Added appraised value",type:"range",step:500,fmt:"usd",conf:"ch",node:"i_feat",...AD("custB","addVal"),why:"Team choice."},
+ {k:"lenderCounts",sub:"lend",g:"feat",label:"Lender counts feature savings when qualifying the buyer",type:"check",conf:"ch",node:"i_feat",...SH("lenderCounts"),why:"Off: lenders usually ignore projected energy savings. The savings still count in the owner's own budget (Test B) and net monthly cost."},
+ {k:"whOn",sub:"wh",g:"feat",label:"Lease a warehouse and buy in bulk",type:"check",conf:"ch",node:"i_wh",...WH("on"),why:"Off by default; not in the workbook."},
+ {k:"whSf",sub:"wh",g:"feat",label:"Warehouse size (sq ft)",type:"range",step:250,fmt:"num",conf:"ch",node:"i_wh",...WH("sf"),why:"Team choice."},
+ {k:"whRent",sub:"wh",g:"feat",label:"Rent per sq ft per year",type:"range",step:0.25,fmt:"psf",conf:"src",node:"i_wh",...WH("rentSf"),why:"Mid-range of New Haven-area listings."},
+ {k:"whMonths",sub:"wh",g:"feat",label:"Lease length (months)",type:"range",step:1,fmt:"num",conf:"ch",node:"i_wh",...WH("months"),floor:1,why:"Team choice."},
+ {k:"whSetup",sub:"wh",g:"feat",label:"Setup, handling, insurance, trucking",type:"range",step:500,fmt:"usd",conf:"ph",node:"i_wh",...WH("setup"),why:"Placeholder."},
+ {k:"whServed",sub:"wh",g:"feat",label:"Buildings sharing the warehouse",type:"range",step:1,fmt:"num",conf:"ch",node:"i_wh",...WH("served"),floor:1,why:"The 10-building order."},
+ {k:"whShare",sub:"wh",g:"feat",label:"Share of hard cost bought in bulk",type:"range",step:0.01,fmt:"pct",conf:"ph",node:"i_wh",...WH("share"),why:"Placeholder: field materials, appliances, fixtures, solar."},
+ {k:"whDisc",sub:"wh",g:"feat",label:"Bulk discount on those purchases",type:"range",step:0.005,fmt:"pct1",conf:"ph",node:"i_wh",...WH("disc"),why:"Placeholder: needs supplier quotes."},
+ {k:"whInvMonths",sub:"wh",g:"feat",label:"Months materials sit in storage",type:"range",step:1,fmt:"num",conf:"ph",node:"i_wh",...WH("invMonths"),why:"Placeholder."},
+ {k:"whInvRate",sub:"wh",g:"feat",label:"Cost of money tied up in inventory",type:"range",step:0.0025,fmt:"pct2",conf:"ph",node:"i_wh",...WH("invRate"),why:"Same as the construction-loan placeholder."},
  {k:"hdf",g:"stack",label:"HDF / CT Home Funds grant, per home",type:"range",step:5000,fmt:"usd",conf:"ph",node:"i_dsub",...SH("hdf"),why:"The program's stated maximum. Stacking with DOH unconfirmed."},
  {k:"ahp",g:"stack",label:"FHLBank Boston AHP, per home",type:"range",step:5000,fmt:"usd",conf:"src",node:"i_dsub",...SH("ahp"),why:"The program's per-unit maximum; competitive."},
  {k:"htcc",g:"stack",label:"HTCC award to a nonprofit sponsor, per year",type:"range",step:25000,fmt:"usd",conf:"src",node:"i_dsub",...SH("htcc"),why:"The program's per-applicant maximum."},
@@ -902,7 +1058,7 @@ const CTRL=[
  {k:"waiver",g:"ny",label:"City permit and fee waiver ($/building)",type:"range",ny:true,step:500,fmt:"usd",conf:"ny",node:"n_waiver",...NY("waiver"),why:"Off by default. Not in the workbook.",lands:"Permits → soft costs"},
  {k:"abate",g:"ny",label:"Property tax abatement (share of tax)",type:"range",ny:true,step:0.05,fmt:"pct",conf:"ny",node:"n_abate",...NY("abate"),why:"Off by default. Not in the workbook.",lands:"Owner costs → buyer capacity"}
 ];
-CTRL.forEach(c=>{ if(!c.scope) c.scope=(c.g==="city")?"city":"shared"; c.discrete=c.type!=="range"||["units","hhSize","volume"].includes(c.k); c.overridable=c.scope==="shared"&&c.type==="range"&&!c.ny&&!c.discrete&&c.g!=="stack"&&c.g!=="method"; c.term=termOf(typeof c.label==="function"?c.label():c.label); });
+CTRL.forEach(c=>{ if(!c.scope) c.scope=(c.g==="city")?"city":"shared"; c.discrete=c.type!=="range"||["units","hhSize","volume"].includes(c.k); c.overridable=c.scope==="shared"&&c.type==="range"&&!c.ny&&!c.discrete&&!["stack","method","feat"].includes(c.g); c.term=termOf(typeof c.label==="function"?c.label():c.label); });
 const CTRL_BY=Object.fromEntries(CTRL.map(c=>[c.k,c]));
 const lbl=c=>typeof c.label==="function"?c.label():c.label;
 const PCT_F=["pct","pct1","pct2","pct3"];
@@ -910,12 +1066,12 @@ function fmtCtl(c,v){
   if(typeof v==="boolean") return v?"On":"Off";
   if(typeof v==="string") return v;
   switch(c.fmt){case "usd":return usd(v);case "pct":return pct(v,0);case "pct1":return pct(v,1);case "pct2":return pct(v,2);case "pct3":return pct(v,3);
-  case "psf":return "$"+(+v).toFixed(2);case "mill":return (+v).toFixed(2);case "x":return (+v).toFixed(2)+"×";case "dec":return (+v).toFixed(2);default:return Math.round(v).toLocaleString();}
+  case "psf":return "$"+(+v).toFixed(2);case "mill":return (+v).toFixed(2);case "x":return (+v).toFixed(2)+"×";case "dec":return (+v).toFixed(2);case "dpw":return "$"+(+v).toFixed(2)+"/W";case "kwh":return "$"+(+v).toFixed(4).replace(/0$/,"")+"/kWh";case "kw":return (+v).toFixed(1)+" kW";default:return Math.round(v).toLocaleString();}
 }
-const DISP_DEC={pct:1,pct1:1,pct2:2,pct3:3,usd:0,psf:2,mill:2,x:2,num:0,dec:2};
+const DISP_DEC={pct:1,pct1:1,pct2:2,pct3:3,usd:0,psf:2,mill:2,x:2,num:0,dec:2,dpw:2,kwh:4,kw:1};
 function toDisp(c,v){const s=PCT_F.includes(c.fmt)?v*100:v;return +s.toFixed(DISP_DEC[c.fmt]??2);}
 function fromDisp(c,t){const n=parseFloat(String(t).replace(/[$,%×\s]/g,""));if(!isFinite(n))return null;return PCT_F.includes(c.fmt)?n/100:n;}
-function unitOf(c){return PCT_F.includes(c.fmt)?"%":c.fmt==="usd"?"$":c.fmt==="psf"?"$/sf":c.fmt==="x"?"×":c.fmt==="dec"?"mo":"";}
+function unitOf(c){return PCT_F.includes(c.fmt)?"%":c.fmt==="usd"?"$":c.fmt==="psf"?"$/sf":c.fmt==="x"?"×":c.fmt==="dec"?"mo":c.fmt==="dpw"?"$/W":c.fmt==="kwh"?"$/kWh":c.fmt==="kw"?"kW":"";}
 
 const isOv=(St,c,city)=>!!(St.ov&&St.ov[city]&&Object.prototype.hasOwnProperty.call(St.ov[city],c.k));
 function getV(c,St,city){return isOv(St,c,city)?St.ov[city][c.k]:c.get(St,city);}
@@ -926,14 +1082,22 @@ function computeCity(St,city,ami){
 }
 computeAll=function(St){const o={};CITIES.forEach(c=>o[c]=computeCity(St,c));return o;};
 function defV(c,city){return getV(c,DEFAULTS,city);}
+const EXT={};
 function boundsOf(c,city){
   const r=rg(c,city); const v=getV(c,S,city), d=defV(c,city);
   let lo=c.min!==undefined?c.min:(r?r.lo:v), hi=c.max!==undefined?c.max:(r?r.hi:v);
   if(c.min===undefined&&r){ if(hi-lo<1e-12){const pad=Math.max(Math.abs(lo)*0.1,c.step*5);lo=lo-pad;hi=hi+pad;} }
-  if(c.min===undefined){lo=Math.min(lo,v,d);hi=Math.max(hi,v,d);}
-  if(lo<0&&c.min===undefined&&(r&&r.lo>=0)) lo=Math.max(0,lo);
+  if(typeof v==="number"){lo=Math.min(lo,v);hi=Math.max(hi,v);} if(typeof d==="number"){lo=Math.min(lo,d);hi=Math.max(hi,d);}
+  const e=EXT[c.k]; if(e){if(e.lo!==undefined)lo=Math.min(lo,e.lo);if(e.hi!==undefined)hi=Math.max(hi,e.hi);}
+  const fl=floorOf(c,r); if(lo<fl) lo=fl;
+  if(hi-lo<1e-12) hi=lo+(c.step||1)*10;
   return [lo,hi];
 }
+function floorOf(c,r){if(c.floor!==undefined)return c.floor;const base=c.min!==undefined?c.min:(r?r.lo:0);return base>=0?0:-Infinity;}
+function stretch(c,city,v){const [lo,hi]=boundsOf(c,city);const span=hi-lo;const st=c.step||span/100;const e=EXT[c.k]||{};let ch=false;
+  if(v>=hi-st/2){e.hi=hi+span*0.5;ch=true;}
+  if(v<=lo+st/2){const fl=floorOf(c,rg(c,city));if(lo>fl){e.lo=Math.max(fl,lo-span*0.5);ch=true;}}
+  if(ch){EXT[c.k]=e;} return ch;}
 
 /* ===================== FLOW GRAPH ===================== */
 const N=[
@@ -954,6 +1118,9 @@ const N=[
  {id:"i_prog",col:0,label:"Units · bedrooms · sq ft",type:"input",conf:"ch",ctl:["units","ownerBR","ownerSF","rentSF","grossup"],term:"grossup",v:()=>S.shared.units+" units · "+S.shared.ownerBR+"+"+S.shared.rentBR,how:"The building program."},
  {id:"i_method",col:0,label:"Method · order volume",type:"input",conf:"ph",ctl:["method","volume","factory","field","transport","learn","stick"],term:"volume",v:()=>(S.shared.method==="Stick-built"?"Stick-built":mName())+" · "+S.shared.volume+" bldgs",how:"Manufacturer and order size set the cost per sq ft through each firm's learning curve."},
  {id:"i_site",col:0,label:"Site work · hard contingency",type:"input",conf:"src",ctl:["clearing","utilities","landscape","fence","hardCont"],v:(R)=>usdK(R.site-R.phase2)+" · "+pct(S.shared.hardCont),how:"Demolition, utilities, landscaping and fencing, from the redacted infill budget."},
+ {id:"i_hx",col:0,label:"Other hard-cost line items",type:"input",conf:"ch",ctl:["hxFound","hxAppl","hxFin","hxAcc"],v:(R)=>R.hx>0.5?usdK(R.hx):"$0",how:"Foundation premium, appliances, finishes, accessibility. $0 until the design team has figures."},
+ {id:"i_feat",col:0,label:"Add-on features",type:"input",conf:"ph",ctl:["solarOn","solarKw","solarCostW","solarRebateW","solarCredit","solarYield","solarRate","solarAdder","solarShare","solarOm","solarVal","batOn","batKwh","batCost","batInc","batBenefit","effOn","effCost","effRebate","effSave","custAOn","custACost","custASave","custBOn","custBCost","custBSave","lenderCounts"],term:"solar",v:()=>{const a=S.shared.add;const on=[["solar","Solar"],["battery","Battery"],["eff","Efficiency"],["custA","Add-on A"],["custB","Add-on B"]].filter(([k])=>a[k].on).map(x=>x[1]);return on.length?on.join(" · "):"none on";},how:"Optional features. The project pays to install them, the owner gets the savings, and any added appraised value raises the sale price."},
+ {id:"i_wh",col:0,label:"Warehouse · bulk buying",type:"input",conf:"ph",ctl:["whOn","whSf","whRent","whMonths","whSetup","whServed","whShare","whDisc","whInvMonths","whInvRate"],term:"wh",v:(R)=>S.shared.wh.on?(R.whNet<0?"saves ":"costs ")+usdK(Math.abs(R.whNet))+"/bldg":"off",how:"Rent and handling spread across the buildings served, plus the cost of money tied up in inventory, minus the bulk discount."},
  {id:"n_phase2",col:0,label:"Phase II · remediation",type:"ny",conf:"ny",ctl:["phase2"],v:()=>nyv("phase2"),how:"Not yet modeled. Added to site work."},
  {id:"i_softs",col:0,label:"Soft cost line items",type:"input",conf:"src",ctl:["architect","engineering","surveys","phase1","permits","risk","legal","apprInsp","marketing","coord","softCont"],term:"soft",v:(R)=>usdK(R.soft)+" incl. "+pct(S.shared.softCont)+" cont.",how:"Design, engineering, surveys, Phase I, permits, insurance, legal and marketing, from the redacted budgets."},
  {id:"n_waiver",col:0,label:"City fee waiver",type:"ny",conf:"ny",ctl:["waiver"],v:()=>nyv("waiver"),how:"Not yet modeled. Reduces permits."},
@@ -965,14 +1132,14 @@ const N=[
  {id:"c_rent",col:1,label:"Rent charged",fmt:"mo",r:"rent",good:1,deps:["i_ami","i_rentT","i_ua","i_mkt"],how:"The lower of the AMI rent limit (net of utilities) and market rent.",f:"MIN(AMI100 × BR factor × rent % × 30% / 12 − UA, market)",extra:R=>"Set by: "+R.rentBinding},
  {id:"c_collect",col:1,label:"Rent collected, after vacancy",fmt:"mo",r:"collected",good:1,deps:["c_rent","i_vac"],how:"Counts toward Test B.",f:"rent × (1 − vacancy)"},
  {id:"c_lrent",col:1,label:"Rent a lender counts",fmt:"mo",r:"lenderRentM",good:1,deps:["c_rent","i_tests"],term:"rentCredit",how:"Counts toward Test A.",f:"rent × 75%"},
- {id:"c_fmv",col:1,label:"Appraised value (FMV)",fmt:"usd",r:"fmv",deps:["i_appr","i_prog"],term:"fmv",how:"The lender's ceiling and the sale price.",f:"CAMA median, new-build precedent or custom"},
- {id:"c_opex",col:1,label:"Non-mortgage costs",fmt:"mo",r:"opex",good:-1,deps:["c_fmv","i_mill","i_opex","n_abate"],how:"Tax on the appraised value + insurance + common utilities + owner energy + maintenance reserve.",f:"tax + insurance + utilities + energy + 1% of value / 12"},
+ {id:"c_fmv",col:1,label:"Appraised value (FMV)",fmt:"usd",r:"fmv",deps:["i_appr","i_prog","i_feat"],term:"fmv",how:"The lender's ceiling and the sale price.",f:"CAMA median, new-build precedent or custom"},
+ {id:"c_opex",col:1,label:"Non-mortgage costs",fmt:"mo",r:"opex",good:-1,deps:["c_fmv","i_mill","i_opex","n_abate","i_feat"],how:"Tax on the appraised value + insurance + common utilities + owner energy + maintenance reserve, minus savings from add-on features.",f:"tax + insurance + utilities + energy + 1% of value / 12 − feature savings",extra:R=>R.featSaveMo>0.5?"Feature savings "+usd(R.featSaveMo)+"/mo":"No feature savings"},
  {id:"c_k",col:1,label:"Payment per $1 borrowed",fmt:"fac",r:"k",good:-1,deps:["i_mort"],how:"Monthly principal, interest and FHA insurance per dollar of loan.",f:"PMT(rate/12, term×12, 1) + MIP/12"},
  {id:"c_gsf",col:1,label:"Gross sq ft",fmt:"sf",r:"gsf",deps:["i_prog"],term:"gsf",how:"(Owner unit + rental units) × gross-up.",f:"(owner sf + rented × rental sf) × gross-up"},
  {id:"c_bldg",col:1,label:"Building hard cost",fmt:"usd",r:"bldg",good:-1,deps:["c_gsf","i_method"],how:"Factory + field cost per sq ft at this order volume × sq ft, plus transport. Stick-built: $/sq ft × sq ft.",f:"(factory + field) × (1 − learn)^log2(volume) × GSF + transport",extra:R=>"All-in "+F.psf(R.hcPSF)},
  {id:"c_testA",col:2,label:"Test A: lender max price",fmt:"usd",r:"testA",good:1,deps:["c_inc","c_lrent","c_opex","c_k","i_dp","i_tests"],term:"testA",how:"40% of (own income + credited rent), minus non-mortgage costs, turned into a loan plus the down payment.",f:"((inc/12 + lender rent) × 40% − costs) / k / (1 − down)"},
  {id:"c_testB",col:2,label:"Test B: owner max price",fmt:"usd",r:"testB",good:1,deps:["c_inc","c_collect","c_opex","c_k","i_dp","i_tests"],term:"testB",how:"30% of own income + rent collected, minus non-mortgage costs.",f:"(inc/12 × 30% + rent collected − costs) / k / (1 − down)"},
- {id:"c_constr",col:2,label:"Construction (hard) cost",fmt:"usd",r:"construction",good:-1,deps:["c_bldg","i_site","n_phase2"],term:"construction",how:"Building + site work outside the building + hard-cost contingency.",f:"(building + site work) × (1 + contingency)"},
+ {id:"c_constr",col:2,label:"Construction (hard) cost",fmt:"usd",r:"construction",good:-1,deps:["c_bldg","i_hx","i_feat","i_wh","i_site","n_phase2"],term:"construction",how:"Building + other hard-cost items + add-on features + warehouse net cost + site work, plus hard-cost contingency.",f:"(building + line items + features + warehouse + site work) × (1 + contingency)",extra:R=>(R.featCost>0.5?"Features "+usdK(R.featCost)+" · ":"")+(S.shared.wh.on?"Warehouse "+(R.whNet<0?"−":"+")+usdK(Math.abs(R.whNet)):"")||"No add-ons"},
  {id:"c_soft",col:2,label:"Soft costs",fmt:"usd",r:"soft",good:-1,deps:["i_softs","n_waiver"],term:"soft",how:"The line items plus soft-cost contingency.",f:"Σ line items × (1 + soft contingency)"},
  {id:"c_int",col:2,label:"Construction-loan interest",fmt:"usd",r:"interest",good:-1,deps:["c_constr","c_soft","i_loan","i_method"],term:"interest",how:"(Construction + soft) × average draw × rate × months / 12. Modular closes sooner, so it carries fewer months.",f:"(hard + soft) × draw × rate × months / 12"},
  {id:"o_cap",col:3,label:"Buyer capacity",fmt:"usd",r:"capacity",good:1,deps:["c_testA","c_testB"],term:"capacity",how:"The lower of the two tests.",f:"MIN(Test A, Test B)",extra:R=>"Set by the "+R.capBinding},
@@ -1124,7 +1291,7 @@ function renderInspector(){
 }
 function goCtl(k){
   if(mode!=="explore"){setMode("explore");}
-  const c=document.querySelector(`#controls .ctl[data-k="${k}"]`);if(!c)return;const d=c.closest("details");if(d)d.open=true;
+  const c=document.querySelector(`#controls .ctl[data-k="${k}"]`);if(!c)return;let d=c.closest("details");while(d){d.open=true;d=d.parentElement.closest("details");}
   c.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
   const i=c.querySelector("input,select");if(i)i.focus({preventScroll:true});
   c.classList.add("hot");setTimeout(()=>c.classList.remove("hot"),1400);
@@ -1208,7 +1375,14 @@ function buildControls(){
     const ph=cnt.filter(c=>c.conf==="ph").length;
     d.innerHTML=`<summary><h3>${g.label}</h3><span class="note">${cnt.length} inputs${ph?` · ${ph} placeholder`:""}</span></summary><div class="grp-body"></div>`;
     const body=d.querySelector(".grp-body");
-    cnt.forEach(c=>body.appendChild(ctlEl(c)));
+    const subIds=new Set((g.subs||[]).map(x=>x[0]));
+    cnt.filter(c=>!c.sub||!subIds.has(c.sub)).forEach(c=>body.appendChild(ctlEl(c)));
+    (g.subs||[]).forEach(([sid,slabel,tog])=>{const items=cnt.filter(c=>c.sub===sid);if(!items.length)return;
+      const sd=document.createElement("details");sd.className="sub";sd.dataset.sub=sid;if(tog)sd.dataset.tog=tog;
+      const key=g.id+"/"+sid; sd.open=openState[key]!==undefined?openState[key]:(sid==="mfr");
+      sd.addEventListener("toggle",()=>{openState[key]=sd.open;try{localStorage.setItem(LS+"open",JSON.stringify(openState));}catch(e){}});
+      sd.innerHTML=`<summary><span class="sub-l">${esc(slabel)}</span><span class="sub-r">${tog?'<span class="tag subtog"></span>':""}<span class="note">${items.length}</span></span></summary><div class="sub-body"></div>`;
+      const sb=sd.querySelector(".sub-body"); items.forEach(c=>sb.appendChild(ctlEl(c))); body.appendChild(sd);});
     box.appendChild(d);
   });
 }
@@ -1226,6 +1400,7 @@ function ctlEl(c){
   const afterSet=()=>{ if(c.type==="range"){lastKey=c.k;syncSweepIn();} if(["method","units","ownerBR","rentBR"].includes(c.k))syncSweepIn(); update(); if(!lock){trace(c.node,"down"); clearTimeout(w._t); w._t=setTimeout(untrace,900);} };
   const handler=()=>{ let v= c.type==="range"?parseFloat(input.value): c.type==="check"?input.checked: input.value; setV(c,S,focus,v); afterSet(); };
   input.addEventListener("input",handler); if(c.type!=="range") input.addEventListener("change",handler);
+  if(c.type==="range") input.addEventListener("change",()=>{if(stretch(c,focus,parseFloat(input.value)))syncControls();});
   if(c.type==="range"){const ni=w.querySelector("#"+CSS.escape(id+"-n"));
     const commit=()=>{const v=fromDisp(c,ni.value);if(v===null){syncControls();return;}setV(c,S,focus,v);afterSet();};
     ni.addEventListener("change",commit); ni.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();commit();ni.blur();}});}
@@ -1246,7 +1421,9 @@ function infoHTML(c,city){
   if(c.ny) h+=`<span class="ti-sec">Enters the math at: ${esc(c.lands)}.</span>`;
   return h;
 }
+function syncSubs(){document.querySelectorAll("details.sub[data-tog]").forEach(sd=>{const on=!!getV(CTRL_BY[sd.dataset.tog],S,focus);const t=sd.querySelector(".subtog");t.textContent=on?"On":"Off";t.className="tag subtog "+(on?"src":"ny");});}
 function syncControls(){
+  syncSubs();
   document.querySelectorAll("#controls .ctl").forEach(w=>{const c=CTRL_BY[w.dataset.k];const id="ctl-"+c.k;const input=w.querySelector("#"+CSS.escape(id));
     const v=getV(c,S,focus), d=defV(c,focus), ov=isOv(S,c,focus);
     w.querySelector(".ctl-l").innerHTML=termWrap(lbl(c));
@@ -1271,6 +1448,7 @@ function syncControls(){
     }
     else if(c.type==="check") input.checked=!!v; else input.value=v;
     if(c.ny){const on=c.on(S,focus);w.querySelector("#"+CSS.escape(id+"-on")).checked=on;w.classList.toggle("off",!on);}
+    const fsub=w.closest("details.sub[data-tog]"); if(fsub&&fsub.dataset.tog!==c.k){const on=!!getV(CTRL_BY[fsub.dataset.tog],S,focus);w.classList.toggle("feat-off",!on);}
     const isMfr=["factory","field","transport","learn"].includes(c.k); w.style.opacity=(isMfr&&S.shared.method==="Stick-built")||(c.k==="stick"&&S.shared.method!=="Stick-built")?.55:"";
   });
 }
@@ -1353,6 +1531,7 @@ function renderHomeowner(){
     ["Affordable price",R=>usd(R.afford)],
     ["Appraised value",R=>usd(R.fmv)],
     ["Sales gap (buyer-side subsidy needed)",R=>usd(R.salesGap),R=>R.salesGap>0.5?"neg":""],
+    ["Savings from add-on features",R=>R.featSaveMo>0.5?usd(R.featSaveMo)+"/mo":"–"],
     ["Owner's net monthly cost",R=>usd(R.net)+"/mo"],
     ["Net cost as % of income",R=>pct(R.netPct,1),R=>R.netPct>0.3?"neg":""],
     ["Share of costs paid by the tenant's rent",R=>pct(R.tenantShare,0)],
@@ -1469,7 +1648,9 @@ const SCEN=[
  {l:"DOH cap $314.5K",f:T=>{T.shared.dohCap=314500;}},{l:"HDF cannot stack with DOH",f:T=>{T.shared.hdf=0;}},
  {l:"No AHP award",f:T=>{T.shared.ahp=0;}},{l:"No HTCC",f:T=>{T.shared.htcc=0;}},
  {l:"Order 50 buildings",f:T=>{T.shared.volume=50;}},{l:"Westchester instead of Reframe",f:T=>{T.shared.method="Modular - Westchester";}},
- {l:"Stick-built (calibrated)",f:T=>{T.shared.method="Stick-built";}}
+ {l:"Stick-built (calibrated)",f:T=>{T.shared.method="Stick-built";}},
+ {l:"Add 6 kW rooftop solar",f:T=>{T.shared.add.solar.on=true;}},
+ {l:"Warehouse and bulk buying",f:T=>{T.shared.wh.on=true;}}
 ];
 function renderTornado(){
   const svg=document.getElementById("tornado");svg.innerHTML="";
@@ -1483,6 +1664,21 @@ function renderTornado(){
     CITIES.forEach((c,j)=>{const v=r[c];const x0=Math.min(X(0),X(v)),w=Math.abs(X(v)-X(0));stitle(el("rect",{x:x0,y:y+3+j*6,width:Math.max(w,v===0?0:1),height:5,fill:`var(${CITY_COLOR[c]})`,opacity:c===focus?1:.55},svg),`${c}: ${v<0?"−":"+"}${usd(Math.abs(v))}`);});
     const fv=r[focus];el("text",{x:W-R+4,y:y+15,"font-size":10.5,"font-family":"IBM Plex Mono, monospace","font-weight":600,fill:Math.abs(fv)<1?"var(--ink-3)":fv<0?"var(--good)":"var(--bad)"},svg).textContent=Math.abs(fv)<1?"0":(fv<0?"−":"+")+usdK(Math.abs(fv));
   });
+}
+
+/* --- features panel --- */
+const FEATS=[["solar","Rooftop solar"],["battery","Battery storage"],["eff","Efficiency / heat-pump package"],["custA","Custom add-on A"],["custB","Custom add-on B"]];
+function renderFeatures(){
+  document.getElementById("ftCity").textContent=focus;
+  const rows=FEATS.map(([k,l])=>{const on=S.shared.add[k].on;const Ton=clone(S),Toff=clone(S);Ton.shared.add[k].on=true;Toff.shared.add[k].on=false;
+    const A=computeCity(Ton,focus),B=computeCity(Toff,focus);const cost=A.featCost-B.featCost, save=A.featSaveMo-B.featSaveMo, dGap=A.remain-B.remain, dNet=A.net-B.net;
+    const pay=save>0.5?cost/(save*12):null; const life=k==="solar"?A.solar25:save*12*25;
+    return `<tr><td>${esc(l)}</td><td><span class="tag ${on?"src":"ny"}">${on?"On":"Off"}</span></td><td class="num">${usdK(cost)}</td><td class="num">${dGap>0.5?"+":dGap<-0.5?"−":""}${usdK(Math.abs(dGap))}</td><td class="num">${save>0.5?usd(save)+"/mo":"–"}</td><td class="num">${dNet<-0.5?"−"+usd(-dNet)+"/mo":dNet>0.5?"+"+usd(dNet)+"/mo":"–"}</td><td class="num">${pay===null?"–":pay.toFixed(1)+" yrs"}</td><td class="num">${life>0.5?usdK(life):"–"}</td></tr>`;});
+  const Ton=clone(S),Toff=clone(S);Ton.shared.wh.on=true;Toff.shared.wh.on=false;const A=computeCity(Ton,focus),B=computeCity(Toff,focus);const won=S.shared.wh.on;
+  rows.push(`<tr><td>Warehouse and bulk buying</td><td><span class="tag ${won?"src":"ny"}">${won?"On":"Off"}</span></td><td class="num" title="Rent, setup and inventory carry per building, minus the bulk discount">${A.whNet<0?"−":""}${usdK(Math.abs(A.whNet))}</td><td class="num">${(A.remain-B.remain)>0.5?"+":(A.remain-B.remain)<-0.5?"−":""}${usdK(Math.abs(A.remain-B.remain))}</td><td class="num" colspan="2">saves ${usdK(A.whSave)} · costs ${usdK(A.whPerBldg+A.whCarry)} per building</td><td class="num" colspan="2">${A.whBreakEven===null?"never breaks even at these inputs":"breaks even at "+Math.ceil(A.whBreakEven)+" buildings"}</td></tr>`);
+  document.getElementById("featTbl").innerHTML=`<thead><tr><th>Feature</th><th>Status</th><th>Net upfront cost per building</th><th>Change in remaining developer gap</th><th>Owner savings</th><th>Change in owner's net monthly cost</th><th>Simple payback</th><th>25-year owner savings</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+  const sol=S.shared.add.solar;
+  document.getElementById("featNote").innerHTML=`Solar is valued at the retail rate under RRES Netting (${fmtCtl(CTRL_BY.solarRate,sol.rate)} plus a ${fmtCtl(CTRL_BY.solarAdder,sol.adder)} adder), on a 20-year tariff. The 25-year figure assumes a ${pct(sol.esc,1)} yearly price rise and ${pct(sol.degr,1)} yearly panel loss. ${S.shared.lenderCounts?"Lenders are set to count the savings, so they also raise what the buyer can borrow.":"Lenders are set to ignore the savings. They still lower the owner's own budget test and net monthly cost."} Payback compares the project's cost with the owner's savings, because different parties pay and benefit.`+(()=>{const R=computeCity(S,focus);return R.featSaveMo>S.shared.energy+0.5?` <b>Note:</b> feature savings (${usd(R.featSaveMo)}/mo) exceed the owner's energy bill (${usd(S.shared.energy)}/mo). Under RRES Netting, extra credits carry forward and are paid out at a lower rate at year end, so the savings above the bill may be overstated. Consider a smaller system.`:"";})();
 }
 
 /* --- research slots --- */
@@ -1525,6 +1721,7 @@ function applyStep(){
   selNode=STEPS[step].nodes[STEPS[step].nodes.length-1]; renderInspector(); markSel();
   const keep=new Set(STEPS[step].ctl);
   document.querySelectorAll("#controls .ctl").forEach(w=>w.hidden=!keep.has(w.dataset.k));
+  document.querySelectorAll("details.sub").forEach(d=>{const any=[...d.querySelectorAll(".ctl")].some(w=>!w.hidden);d.hidden=!any;if(any)d.open=true;});
   document.querySelectorAll("details.grp").forEach(d=>{const any=[...d.querySelectorAll(".ctl")].some(w=>!w.hidden);d.hidden=!any;if(any)d.open=true;});
   document.getElementById("railnote").textContent="Inputs for this step";
 }
@@ -1566,7 +1763,7 @@ function renderPresent(){
   document.getElementById("pzText").innerHTML=st.x(R);
   const box=document.getElementById("pzCtls");
   if(box.dataset.step!==String(pzStep)){box.dataset.step=pzStep;box.innerHTML=st.ctl.map(k=>{const c=CTRL_BY[k];return `<div class="pzc" data-k="${k}"><div class="pzc-top"><label for="pz-${k}">${esc(lbl(c))}</label><span></span></div>${c.type==="range"?`<input type="range" id="pz-${k}">`:`<select id="pz-${k}">${c.opts.map(o=>`<option>${o}</option>`).join("")}</select>`}</div>`;}).join("");
-    box.querySelectorAll(".pzc").forEach(w=>{const c=CTRL_BY[w.dataset.k];const i=w.querySelector("input,select");i.addEventListener("input",()=>{setV(c,S,focus,c.type==="range"?parseFloat(i.value):i.value);update();});});}
+    box.querySelectorAll(".pzc").forEach(w=>{const c=CTRL_BY[w.dataset.k];const i=w.querySelector("input,select");i.addEventListener("input",()=>{setV(c,S,focus,c.type==="range"?parseFloat(i.value):i.value);update();});if(c.type==="range")i.addEventListener("change",()=>{if(stretch(c,focus,parseFloat(i.value)))update();});});}
   box.querySelectorAll(".pzc").forEach(w=>{const c=CTRL_BY[w.dataset.k];const i=w.querySelector("input,select");const v=getV(c,S,focus);w.querySelector(".pzc-top span").textContent=fmtCtl(c,v);
     if(c.type==="range"){const [lo,hi]=boundsOf(c,focus);i.min=lo;i.max=hi;i.step=c.step;if(document.activeElement!==i)i.value=v;}else i.value=v;});
   const earlier=new Set(STEPS.slice(0,pzStep).flatMap(x=>x.nodes)); const prior=new Set(st.nodes.filter(id=>earlier.has(id)));
@@ -1592,7 +1789,7 @@ function setMode(m){
   ["present","explain","explore"].forEach(x=>document.getElementById("m-"+x).setAttribute("aria-pressed",m===x));
   document.getElementById("stepper").hidden=m!=="explain";
   if(m==="explain"){applyStep();}
-  else{stepLock=null;untrace();document.querySelectorAll("#controls .ctl").forEach(w=>w.hidden=false);document.querySelectorAll("details.grp").forEach(d=>d.hidden=false);document.getElementById("railnote").textContent="Every input in the workbook";}
+  else{stepLock=null;untrace();document.querySelectorAll("#controls .ctl").forEach(w=>w.hidden=false);document.querySelectorAll("details.grp,details.sub").forEach(d=>d.hidden=false);document.getElementById("railnote").textContent="Every input in the workbook";}
   if(m==="present") renderPresent();
   update(true);
 }
@@ -1700,6 +1897,10 @@ async function buildXlsx(){
   if(s.rentAMI===0) notApplied.push("Market-rate rental (0% AMI): the workbook formula assumes an AMI rent.");
   if(s.units!==2||s.ownerBR!=="3BR"||s.rentBR!=="2BR") notApplied.push(`Building program ${s.units} units, ${s.ownerBR} + ${s.rentBR}: the workbook's labels assume a 3BR + 2BR duplex, so check its site-work and soft-cost lines.`);
   Object.entries(s.ny).forEach(([k,o])=>{if(o.on)notApplied.push(`${lbl(CTRL_BY[k])} (${fmtCtl(CTRL_BY[k],o.val)}): not in the workbook yet.`);});
+  [["solar","Rooftop solar"],["battery","Battery storage"],["eff","Efficiency / heat-pump package"],["custA","Custom add-on A"],["custB","Custom add-on B"]].forEach(([k,l])=>{if(s.add[k].on)notApplied.push(`${l}: not in the workbook yet.`);});
+  if(s.wh.on) notApplied.push("Warehouse and bulk buying: not in the workbook yet.");
+  if(s.lenderCounts) notApplied.push("Lender counting feature savings: not in the workbook.");
+  const hxT=s.hx.foundation+s.hx.appliances+s.hx.finishes+s.hx.access; if(hxT>0) notApplied.push(`Other hard-cost line items (${usd(hxT)} per building): not in the workbook yet.`);
   ["Hartford","Waterbury"].forEach(city=>{const ch=CTRL.filter(cc=>cc.scope==="city"&&JSON.stringify(getV(cc,S,city))!==JSON.stringify(defV(cc,city)));const ov=Object.keys(S.ov[city]);if(ch.length||ov.length)notApplied.push(`${city}: ${ch.length+ov.length} change${ch.length+ov.length>1?"s":""}. The workbook models New Haven only.`);});
   for(const n of Object.keys(sheets)){X[n]=X[n].replace(/(<c\b[^>]*>)(<f\b[^>]*\/>|<f\b[^>]*>[\s\S]*?<\/f>)<v>[^<]*<\/v>/g,"$1$2");}
   const stamp=new Date().toLocaleString();
@@ -1722,7 +1923,7 @@ function fileStamp(){const d=new Date();return d.getFullYear()+"-"+String(d.getM
 /* ===================== UPDATE ===================== */
 function update(noPulse){
   recompute(); computeImpacts(); if(noPulse) PREV=null;
-  syncControls(); renderKPIs(); renderFlow(); renderInspector(); renderFacts(); renderStack(); renderCmp(); renderRules(); renderHomeowner(); renderScale(); renderPortfolio(); renderNY();
+  syncControls(); renderKPIs(); renderFlow(); renderInspector(); renderFacts(); renderStack(); renderCmp(); renderRules(); renderHomeowner(); renderScale(); renderFeatures(); renderPortfolio(); renderNY();
   if(mode==="explore"){renderSweep();renderTornado();}
   if(mode==="explain"){renderStepper(); if(stepLock) highlightSet(stepLock);}
   if(mode==="present") renderPresent();
@@ -1762,6 +1963,4 @@ document.getElementById("xlsxDl").onclick=async()=>{const st=document.getElement
 window.__pge={buildXlsx,summaryText,shareUrl,decodeState,S:()=>S,setS:(x)=>{S=x;update(true);},compute,computeCity};
 update(true); setMode(mode);
 </script>
-
-</body>
-</html>
+</body></html>
