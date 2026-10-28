@@ -379,6 +379,25 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
 .b-res div{display:flex;flex-direction:column;gap:2px;min-width:140px}
 .b-res .v{font-family:var(--f-mono);font-size:1.35rem;font-weight:600;line-height:1.15}
 @media (max-width:900px){body.mode-build .shell{display:flex;flex-direction:column} body.mode-build .shell>main{order:-1}}
+.navgrp{display:flex;flex-direction:column;gap:4px}
+.navlab{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.seg.big{border:1.5px solid var(--accent);padding:3px;gap:3px}
+.seg.big button{padding:6px 14px;font-size:.92rem;flex-direction:column;align-items:flex-start;gap:0;line-height:1.15}
+#citySeg.big button{flex-direction:row;align-items:center;gap:6px;padding:9px 14px}
+.seg.big button b{font-weight:650}
+.seg.big button small{font-size:.7rem;font-weight:400;opacity:.75}
+.seg.big button[aria-pressed="true"] small{opacity:.9}
+.dlg-box.wel{gap:16px;max-width:1040px}
+.wel h2{font-size:1.4rem;margin:2px 0 6px}
+.wel-lead{margin:0;font-size:.98rem;line-height:1.5;color:var(--ink)}
+.wel-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:980px){.wel-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}}
+.wel-card{display:flex;flex-direction:column;gap:4px;border:1px solid var(--rule);border-radius:10px;padding:12px 14px;background:var(--paper);font-size:.86rem;line-height:1.45;color:var(--ink-2)}
+.wel-card b{color:var(--ink)}
+.wel-card>b{font-size:.95rem}
+.wel-n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--sheet);font-weight:700;font-size:.78rem;align-items:center;justify-content:center}
+.wel-chk{display:inline-flex;gap:6px;align-items:center;font-size:.86rem;color:var(--ink-2);cursor:pointer}
+@media (max-width:640px){.seg.big button{padding:5px 9px;font-size:.84rem}.seg.big button small{display:none}}
 .changes{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--ink-2);max-width:90ch}
 </style>
 
@@ -388,14 +407,21 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
       <h1>Prefab Gap Explorer 2</h1>
       <small>Housing CT · Prefab Modular team · built on the feedback-response workbook (Oct 14, 2026) · <span class="v1link"><a href="https://eytanjda123.github.io/HousingCTModularModel/" target="_blank" rel="noopener">version 1</a></span></small>
     </div>
-    <div class="seg" role="group" aria-label="Mode">
-      <button id="m-build" aria-pressed="false" title="Work through every input category one step at a time">Build it</button>
-      <button id="m-present" aria-pressed="false" title="Large step-by-step view for a projector">Present</button>
-      <button id="m-explain" aria-pressed="false">Explain</button>
-      <button id="m-explore" aria-pressed="true">Explore</button>
+    <div class="navgrp">
+      <span class="navlab">1 · Choose a view</span>
+      <div class="seg big" role="group" aria-label="View">
+        <button id="m-build" aria-pressed="false" title="Work through every input category one step at a time"><b>Build it</b><small>step by step</small></button>
+        <button id="m-present" aria-pressed="false" title="Large step-by-step view for a projector"><b>Present</b><small>for a room</small></button>
+        <button id="m-explain" aria-pressed="false" title="Walk the input-to-output map one step at a time"><b>Explain</b><small>how it works</small></button>
+        <button id="m-explore" aria-pressed="true" title="Every input and every panel at once"><b>Explore</b><small>everything</small></button>
+      </div>
     </div>
-    <div class="seg" role="group" aria-label="Focus city" id="citySeg"></div>
+    <div class="navgrp">
+      <span class="navlab">2 · Choose a city</span>
+      <div class="seg big" role="group" aria-label="Focus city" id="citySeg"></div>
+    </div>
     <div class="actions">
+      <button class="btn" id="helpBtn" title="Show the welcome guide again">? Guide</button>
       <button class="btn" id="share">Share link</button>
       <button class="btn" id="exportBtn">Export</button>
       <button class="btn" id="pin" title="Make the current settings the comparison point for every change shown">Pin baseline</button>
@@ -620,6 +646,21 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
     <div class="dlg-row"><button class="btn primary" id="xlsxDl">Download Excel model</button><span class="status" id="xlsxStatus"></span></div>
     <p class="note" id="dlNote"></p>
     <div class="dlg-row"><span style="flex:1"></span><button class="btn" data-close="exportDlg">Close</button></div>
+  </div>
+</div>
+<div class="dlg" id="welcomeDlg" hidden role="dialog" aria-modal="true" aria-labelledby="welH">
+  <div class="dlg-box wel">
+    <div><span class="eyebrow">Housing CT · Prefab Modular team</span><h2 id="welH">Welcome to the Prefab Gap Explorer</h2>
+    <p class="wel-lead">This is a live financial model for one owner-occupied two-family modular home on a land bank lot. Change any assumption and watch how it moves the two gaps: what the buyer can't pay (the <b class="side-b">sales gap</b>) and what the sale doesn't cover (the <b class="side-d">developer gap</b>).</p></div>
+    <div class="wel-grid">
+      <div class="wel-card"><span class="wel-n">1</span><b>Choose a view</b><span>Top bar. New here? Start with <b>Build it</b>: one input category at a time, with the decisions to make and a running budget. <b>Present</b> is for a projector, <b>Explain</b> walks the map, and <b>Explore</b> shows everything.</span></div>
+      <div class="wel-card"><span class="wel-n">2</span><b>Choose a city</b><span>Hartford, New Haven or Waterbury. The same building is tested in each city, with its own incomes, rents, tax rate and sales comparables.</span></div>
+      <div class="wel-card"><span class="wel-n">3</span><b>Change the inputs</b><span>The panel on the left. Yellow boxes are inputs: type a value or drag a slider. Each input is tagged Sourced, Placeholder or Team choice, and the <b>i</b> button shows its source.</span></div>
+      <div class="wel-card"><span class="wel-n">4</span><b>Read the results</b><span>The headline numbers sit under the top bar. Hover or click any box on the map to trace where a number comes from. Green and red chips show changes from the baseline.</span></div>
+      <div class="wel-card"><span class="wel-n">5</span><b>Save or share</b><span><b>Share link</b> copies a link to your exact settings. <b>Export</b> downloads a complete live Excel model of the scenario. <b>Reset all</b> returns to the defaults.</span></div>
+    </div>
+    <div class="dlg-row"><button class="btn primary" id="welBuild">Start with Build it</button><button class="btn" id="welClose">Look around on my own</button><span style="flex:1"></span><label class="wel-chk"><input type="checkbox" id="welNoShow"> Don't show this again</label></div>
+    <p class="note">You can reopen this guide anytime with <b>? Guide</b> in the top bar.</p>
   </div>
 </div>
 <div id="tip" role="tooltip" hidden></div>
@@ -2192,6 +2233,12 @@ document.getElementById("sumDl").onclick=()=>download(new Blob([document.getElem
 document.getElementById("xlsxDl").onclick=async()=>{const st=document.getElementById("xlsxStatus");st.textContent="Building the workbook…";st.className="status";
   try{const {blob,written,changes}=await buildXlsx();const res=await download(blob,`Housing_CT_Prefab_Model_${focus.replace(/\s/g,"_")}_${fileStamp()}.xlsx`);st.textContent=res==="declined"?"Download cancelled.":`Done: ${written} inputs written for ${focus}, ${changes} change${changes===1?"":"s"} from the defaults (listed on the Read Me tab).`;st.className=res==="declined"?"status":"status ok";}
   catch(err){st.textContent="Couldn't build the workbook: "+(err.message||err.code);st.className="status err";}};
+function closeWelcome(){try{if(document.getElementById("welNoShow").checked)localStorage.setItem(LS+"welcomed","1");}catch(e){}closeDlg("welcomeDlg");}
+document.getElementById("welClose").onclick=closeWelcome;
+document.getElementById("welBuild").onclick=()=>{closeWelcome();setMode("build");window.scrollTo({top:0});};
+document.getElementById("helpBtn").onclick=()=>{let seen=false;try{seen=localStorage.getItem(LS+"welcomed")==="1";}catch(e){}document.getElementById("welNoShow").checked=seen;openDlg("welcomeDlg");};
+document.getElementById("welcomeDlg").addEventListener("click",e=>{if(e.target.id==="welcomeDlg")closeWelcome();});
+(function(){let seen=false;try{seen=localStorage.getItem(LS+"welcomed")==="1";}catch(e){}if(!seen){openDlg("welcomeDlg");document.getElementById("welBuild").focus();}})();
 window.__pge={buildXlsx,summaryText,shareUrl,decodeState,S:()=>S,setS:(x)=>{S=x;update(true);},setFocus:(c)=>{focus=c;update(true);},compute,computeCity,expValues,XMAP};
 update(true); setMode(mode);
 </script>
