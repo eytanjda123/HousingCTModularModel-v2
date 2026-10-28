@@ -343,6 +343,13 @@ details.sub .sub-r{display:flex;gap:6px;align-items:center}
 .sub-body .ctl{margin:0 -6px}
 .ctl.feat-off{opacity:.5}
 @media (prefers-reduced-motion:reduce){details.sub>summary::before{transition:none}}
+.railtools{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--rule-2)}
+.btn.sm{padding:4px 10px;font-size:.8rem}
+details.grp>summary{padding:12px 14px;background:var(--sheet)}
+details.grp>summary h3{font-size:1.02rem;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+details.grp[open]>summary{border-bottom:1px solid var(--rule-2)}
+details.grp>summary::after{font-size:1.05rem;font-weight:600}
+details.sub>summary .sub-l{font-weight:650;color:var(--ink)}
 .changes{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--ink-2);max-width:90ch}
 </style>
 
@@ -375,6 +382,7 @@ details.sub .sub-r{display:flex;gap:6px;align-items:center}
       <div class="legend"><span class="tag src">Sourced</span><span class="tag ph">Placeholder</span><span class="tag ch">Team choice</span><span class="tag ny">Not yet modeled</span></div>
       <div class="note">Yellow values are inputs. Type any value in the box, or drag a slider to its end to extend it. The blue band is the researched range and the tick is the default. Hover or click <b>i</b> for each input's default, source and program notes. ↺ resets one input. <span class="mono">ALL</span> = every city, <span class="mono">CITY</span> = the focus city only.</div>
     </div>
+    <div class="railtools"><button class="btn sm" id="openAll" type="button">Open all</button><button class="btn sm" id="closeAll" type="button">Collapse all</button></div>
     <div id="controls"></div>
   </aside>
 
@@ -1421,6 +1429,9 @@ function infoHTML(c,city){
   if(c.ny) h+=`<span class="ti-sec">Enters the math at: ${esc(c.lands)}.</span>`;
   return h;
 }
+function setAllOpen(open){document.querySelectorAll("#controls details.grp,#controls details.sub").forEach(d=>{if(!d.hidden)d.open=open;});}
+document.getElementById("openAll").addEventListener("click",()=>setAllOpen(true));
+document.getElementById("closeAll").addEventListener("click",()=>setAllOpen(false));
 function syncSubs(){document.querySelectorAll("details.sub[data-tog]").forEach(sd=>{const on=!!getV(CTRL_BY[sd.dataset.tog],S,focus);const t=sd.querySelector(".subtog");t.textContent=on?"On":"Off";t.className="tag subtog "+(on?"src":"ny");});}
 function syncControls(){
   syncSubs();
