@@ -98,6 +98,7 @@ details.grp[open]>summary::after{content:"–"}
 .ctl.hot{background:var(--accent-soft)}
 .ctl{cursor:pointer}
 .ctl.locked{box-shadow:inset 3px 0 0 var(--accent)}
+.ctl.flash{animation:ctlflash 1.4s ease-out}@keyframes ctlflash{0%,30%{box-shadow:inset 3px 0 0 var(--accent),0 0 0 2px var(--accent)}100%{box-shadow:inset 3px 0 0 transparent,0 0 0 0 transparent}}@media (prefers-reduced-motion:reduce){.ctl.flash{animation:none;outline:2px solid var(--accent)}}
 #flow .node.locked rect.box{stroke:var(--accent);stroke-width:2.6}
 #lockNote{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .ctl-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
@@ -1405,8 +1406,8 @@ function buildFlow(){
     g.addEventListener("mouseleave",()=>untrace());
     g.addEventListener("focus",()=>{if(!lock)trace(n.id,"both");});
     g.addEventListener("blur",()=>untrace());
-    g.addEventListener("click",e=>{e.stopPropagation();selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);});
-    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);}});
+    g.addEventListener("click",e=>{e.stopPropagation();selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);if(lock)scrollRailToNode(n.id);});
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);if(lock)scrollRailToNode(n.id);}});
   });
   svg.addEventListener("click",e=>{if(!e.target.closest(".node"))setLock(null);});
   markSel();
@@ -1419,6 +1420,24 @@ function setLock(l){lock=l;const note=document.getElementById("lockNote");
   if(lock&&NODE_EL[lock.id])NODE_EL[lock.id].g.classList.add("locked");
   document.querySelectorAll("#controls .ctl.locked").forEach(w=>w.classList.remove("locked"));
   if(lock&&lock.ctl){const w=document.querySelector(`#controls .ctl[data-k="${lock.ctl}"]`);if(w)w.classList.add("locked");}}
+// Bring the input(s) a map box highlights into view in the inputs list: the box's own inputs first, else the first highlighted one.
+function scrollRailToNode(id){
+  const rail=document.querySelector(".rail"); if(!rail) return;
+  const all=[...document.querySelectorAll("#controls .ctl")].filter(w=>!w.closest("[hidden]")&&getComputedStyle(w).display!=="none");
+  const own=all.filter(w=>{const c=CTRL_BY[w.dataset.k];return c&&c.node===id;});
+  const w=own[0]||all.find(x=>x.classList.contains("hot")); if(!w) return;
+  // open the collapsed group and sub-section that hold it (and the box's other inputs)
+  (own.length?own:[w]).forEach(x=>{let d=x.parentElement;while(d&&d!==rail){if(d.tagName==="DETAILS"&&!d.open)d.open=true;d=d.parentElement;}});
+  document.querySelectorAll("#controls .ctl.flash").forEach(x=>x.classList.remove("flash"));
+  requestAnimationFrame(()=>{
+    if(rail.scrollHeight>rail.clientHeight+4){
+      const head=rail.querySelector(".rail-head"), off=(head?head.offsetHeight:0)+12;
+      const top=w.getBoundingClientRect().top-rail.getBoundingClientRect().top+rail.scrollTop-off;
+      rail.scrollTo({top:Math.max(0,top),behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+    }
+    w.classList.add("flash"); setTimeout(()=>w.classList.remove("flash"),1400);
+  });
+}
 function toggleLock(id,dir,label,ctl){if(lock&&lock.id===id&&lock.ctl===ctl){setLock(null);return;}setLock({id,dir,label,ctl});}
 function markSel(){Object.entries(NODE_EL).forEach(([id,o])=>o.g.classList.toggle("sel",id===selNode));}
 let stepLock=null;
