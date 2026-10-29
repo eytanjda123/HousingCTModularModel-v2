@@ -538,6 +538,15 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
       <p class="note" id="apprNote" style="margin-top:8px"></p>
     </section>
 
+    <section class="panel" data-bp="designs">
+      <div class="panel-head">
+        <div><span class="eyebrow">Building designs · focus city</span><h2>How Reframe's standard designs compare</h2></div>
+        <p>Each column runs the whole model with one building swapped in: units, bedrooms, sq ft and gross-up change, and every other input stays as you've set it. Pick a design with <b>Building design</b> at the top of the inputs to make it drive the page. <b>Read the gaps with care:</b> the appraisal stays at the value set for one two-family, so the bigger buildings show larger gaps than an appraiser would. Set the appraisal for each design before comparing them.</p>
+      </div>
+      <div class="tblwrap" style="margin-top:0"><table id="designTbl"></table></div>
+      <p class="note" id="designNote" style="margin-top:8px"></p>
+    </section>
+
     <section class="panel" data-bp="ho">
       <div class="panel-head">
         <div><span class="eyebrow">Homeowner · <span id="hoCity"></span></span><h2>Can the buyer sustain ownership?</h2></div>
@@ -671,6 +680,21 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
 <script id="model">
 /* ===================== MODEL v2 (mirrors Housing_CT_Feedback_Response_Model.xlsx) ===================== */
 const BR=["Studio","1BR","2BR","3BR","4BR"];
+// Building design presets. Reframe areas come from its standard plan sets ("All Products" folder, concept drawings, not for construction).
+const DESIGNS=[
+ {id:"base",name:"Team base case (course sizes)",units:2,ownerBR:"3BR",rentBR:"2BR",oSF:1150,rSF:880,gu:1.12,est:false,
+  note:"Course calculator sizes: 1,150 sq ft 3BR owner unit + 880 sq ft 2BR rental, 12% gross-up (2,274 GSF)."},
+ {id:"stack",name:"Reframe Stacked Duplex",units:2,ownerBR:"3BR",rentBR:"2BR",oSF:1729,rSF:1024,gu:3642/2753,est:false,
+  note:"Reframe two-family for Boston's Welcome Home RFP. Owner takes the 1,729 sq ft unit on levels 2–3 (3BR); the 1,024 sq ft level-1 flat is the rental (2BR). Gross-up matches Reframe's 3,642 sq ft total building area, which includes about 836 sq ft on level 3 not assigned to either unit; set it to about 1.02 if that space is a roof deck."},
+ {id:"td23",name:"Reframe Triple Decker 23 ft (2BR flats)",units:3,ownerBR:"2BR",rentBR:"2BR",oSF:1100,rSF:1100,gu:1,est:true,
+  note:"Reframe's built triple-decker: a 2BR/2BA flat with a flex room on each floor, 23 ft wide and about 50 ft deep. About 1,100 sq ft per floor is our estimate from the drawing dimensions; Reframe did not label areas. An existing design: about 1–2 months to adapt."},
+ {id:"td27",name:"Reframe Triple Decker 27 ft (3BR flats)",units:3,ownerBR:"3BR",rentBR:"3BR",oSF:1300,rSF:1300,gu:1,est:true,
+  note:"Reframe's built 27 ft triple-decker (13 Gilman St, Somerville), a 3BR/2BA flat per floor with rooftop solar. About 1,300 sq ft per floor is our estimate from the drawing scale; labeled room areas sum to about 1,000 sq ft net."},
+ {id:"dtown",name:"Reframe Duplex Townhome (side by side)",units:2,ownerBR:"2BR",rentBR:"2BR",oSF:1120,rSF:1120,gu:1,est:false,
+  note:"Two side-by-side 2BR/1.5BA townhomes of 1,120 sq ft each, plus a 615 sq ft basement each (site-built, not in the GSF here)."}
+];
+function designOf(St){const s=St.shared;const m=DESIGNS.find(d=>d.units===s.units&&d.ownerBR===s.ownerBR&&d.rentBR===s.rentBR&&Math.abs(s.sqft[BR.indexOf(d.ownerBR)]-d.oSF)<0.5&&Math.abs(s.sqft[BR.indexOf(d.rentBR)]-d.rSF)<0.5&&Math.abs(s.grossup-d.gu)<0.0005);return m?m.name:"Custom (edited below)";}
+function applyDesign(St,name){const d=DESIGNS.find(x=>x.name===name);if(!d)return;const s=St.shared;s.units=d.units;s.ownerBR=d.ownerBR;s.rentBR=d.rentBR;s.sqft[BR.indexOf(d.rentBR)]=d.rSF;s.sqft[BR.indexOf(d.ownerBR)]=d.oSF;s.grossup=d.gu;}
 const CITIES=["Hartford","New Haven","Waterbury"];
 const METHODS=["Modular - Reframe","Modular - Westchester","Modular - Bensonwood (panelized)","Modular - TMBR (CLT)","Stick-built"];
 const MIT_TYPES=[["1 adult, 0 children",36111],["2 adults (1 working), 2 children",71019],["2 adults (both working), 1 child",91831],["2 adults (both working), 2 children",121364]];
@@ -866,6 +890,7 @@ const SRC={
  hazel:{t:"CT Public (Dec 3, 2024): Hazel Street, the first DOH–Yale Housing Clinic project: four two-family homes (owner unit + rental), $3.5M state funding incl. $2.6M for the homes",u:"https://ctpublic.org/news/2024-12-03/new-haven-affordable-housing-development-first-in-partnership-between-state-yale"},
  dohPilot:{t:"CT DOH press release, Fourteen Developments: New Haven Neighborhood Revitalization Pilot, four two-unit buildings, $3.5M DOH + $500K CHFA HTCC",u:"https://portal.ct.gov/doh/doh/main/press-releases/fourteen-developments-across-ct"},
  hfdLots:{t:"CT Public (Dec 17, 2025): Hartford offers 20 city lots at $1 each, up to $150K subsidy per affordable unit, buyers ≤120% AMI",u:"https://www.ctpublic.org/news/2025-12-17/new-affordable-homeownership-opportunities-coming-to-hartford-in-2026"},
+ rfPlans:{t:"Reframe Systems standard plan sets (All Products folder shared with the team, concept drawings, 2022–2026): Stacked Duplex area plans, Triple Decker 23 ft and 27 ft, Duplex Townhome, townhomes, bungalow, farmhouse, ADUs",u:""},
  reframe:{t:"Banker & Tradesman: Reframe Systems prices net-zero Passive House homes at $275–$300 per sq ft",u:"https://bankerandtradesman.com/ramping-up-housing-production-through-robotics"},
  olr:{t:"CT OLR Report 2012-R-0098: property is assessed at 70% of fair market value as of Oct 1 (CGS §12-62a); new construction is added to the grand list",u:"https://www.cga.ct.gov/2012/rpt/2012-R-0098.htm"},
  nlondon:{t:"Bloomberg Tax (May 21, 2026): CT Superior Court held a deed restriction capping resale price must be considered in fair market value (New London)",u:"https://news.bloombergtax.com/daily-tax-report/connecticut-superior-court-partially-grants-property-tax-relief-based-on-deed-restriction-value-cap"},
@@ -925,9 +950,9 @@ const RANGES={
  learn:()=>({lo:0,hi:.08,kind:"prov",src:["workshop"],note:"How much factory cost falls each time the order doubles. Faculty placeholder."}),
  volume:()=>({lo:1,hi:100,kind:"ch",src:[],note:"How many buildings are ordered together."}),
  stick:()=>({lo:200,hi:260,kind:"prov",src:["partners"],note:"$220 reproduces the Hartford partner's ~$800K two-family with our site and soft costs. The band is a team bracket."}),
- ownerSF:()=>{const i=BR.indexOf(S.shared.ownerBR),[a,b]=pm(DEFAULTS.shared.sqft[i],.15);return {lo:a,hi:b,kind:"ch",src:[],note:"±15%. The architecture team's plans will set this."};},
- rentSF:()=>{const i=BR.indexOf(S.shared.rentBR),[a,b]=pm(DEFAULTS.shared.sqft[i],.15);return {lo:a,hi:b,kind:"ch",src:[],note:"±15%."};},
- grossup:()=>({lo:1.08,hi:1.18,kind:"prov",src:[],note:"No source yet. Confirm with the architecture team."}),
+ ownerSF:()=>{const i=BR.indexOf(S.shared.ownerBR);let [a,b]=pm(DEFAULTS.shared.sqft[i],.15);const ds=DESIGNS.filter(d=>d.ownerBR===S.shared.ownerBR).map(d=>d.oSF);ds.forEach(v=>{a=Math.min(a,v);b=Math.max(b,v);});return {lo:a,hi:b,kind:"ch",src:["rfPlans"],note:"±15% of the course size, widened to cover Reframe's plan sets for this bedroom count. The architecture team's plans will set this."};},
+ rentSF:()=>{const i=BR.indexOf(S.shared.rentBR);let [a,b]=pm(DEFAULTS.shared.sqft[i],.15);const ds=DESIGNS.filter(d=>d.rentBR===S.shared.rentBR).map(d=>d.rSF);ds.forEach(v=>{a=Math.min(a,v);b=Math.max(b,v);});return {lo:a,hi:b,kind:"ch",src:["rfPlans"],note:"±15% of the course size, widened to cover Reframe's plan sets."};},
+ grossup:()=>({lo:1,hi:1.32,kind:"prov",src:["rfPlans"],note:"1.00 when unit areas are already gross (Reframe triple-deckers, duplex townhome) up to 1.32 for the Stacked Duplex total building area. The course default is 1.12. Confirm with the architecture team."}),
  clearing:crs("clearing",.5), utilities:crs("utilities",.25,"Redacted infill budget: $15,000 per unit × 2. The slider spans ±25%."), landscape:crs("landscape",.25), fence:crs("fence",.5),
  hardCont:()=>({lo:.05,hi:.10,kind:"crs",src:["course"],note:"10% in the redacted homeownership budget; 5% is common for new construction."}),
  architect:crs("architect",.25), engineering:crs("engineering",.25), surveys:crs("surveys",.25),
@@ -1094,6 +1119,7 @@ const GROUPS=[{id:"scn",label:"Building and household"},{id:"city",label:"City d
  {id:"feat",label:"Add-on features and procurement",subs:[["solar","Rooftop solar","solarOn"],["battery","Battery storage","batOn"],["eff","Efficiency / heat-pump package","effOn"],["custA","Custom add-on A","custAOn"],["custB","Custom add-on B","custBOn"],["lend","How lenders treat savings"],["wh","Warehouse and bulk buying","whOn"]]},
  {id:"stack",label:"Developer-side money",subs:[["dsub","State and federal grants"],["nmtc","New Markets Tax Credits","nmtcOn"]]},{id:"ny",label:"Not yet modeled"}];
 const CTRL=[
+ {k:"design",virtual:true,g:"scn",label:"Building design (Reframe plan sets)",type:"select",opts:DESIGNS.map(d=>d.name).concat(["Custom (edited below)"]),conf:"src",node:"i_prog",get:(St)=>designOf(St),set:(St,c,v)=>applyDesign(St,v),why:"Picks a building and fills in units, bedrooms, net sq ft and gross-up below. Reframe sizes come from its standard plan sets; the two triple-decker sizes are our estimates from the drawings. "+DESIGNS.map(d=>d.name+": "+d.note).join(" ")},
  {k:"units",g:"scn",label:"Total units in the building",type:"range",min:1,max:6,floor:1,step:1,fmt:"num",conf:"ch",node:"i_prog",...SH("units"),why:"The team's proposal is a duplex: one owner unit plus one rental."},
  {k:"ownerBR",g:"scn",label:"Owner unit bedrooms",type:"select",opts:BR,conf:"ch",node:"i_prog",...SH("ownerBR"),why:"Team choice: a family-sized home."},
  {k:"rentBR",g:"scn",label:"Rental unit bedrooms",type:"select",opts:BR,conf:"ch",node:"i_rentT",...SH("rentBR"),why:"Team choice. Sets the rent limit, utility allowance, market rent and unit size."},
@@ -1569,7 +1595,7 @@ function ctlEl(c){
   const sw=c.ny?`<label class="switch"><input type="checkbox" id="${id}-on"> Include in model</label>`:"";
   w.innerHTML=`<div class="ctl-top"><span style="min-width:0"><label for="${c.type==="range"?id+"-n":id}" class="ctl-l"></label><button class="info" data-info="${c.k}" aria-label="About this input: default, source and range" aria-expanded="false">i</button></span><span class="ctl-in">${num}<button class="rst" id="${id}-r" aria-label="Reset to default">↺</button></span></div>${inp}${sw}<div class="ctl-meta"><span class="tag ${c.conf}">${CONF_LABEL[c.conf]}</span><span class="scope"></span><span class="ovslot"></span><span class="outtag"></span></div>`;
   const input=w.querySelector("#"+CSS.escape(id));
-  const afterSet=()=>{ if(c.type==="range"){lastKey=c.k;syncSweepIn();} if(["method","units","ownerBR","rentBR"].includes(c.k))syncSweepIn(); update(); if(!lock){trace(c.node,"down"); clearTimeout(w._t); w._t=setTimeout(untrace,900);} };
+  const afterSet=()=>{ if(c.type==="range"){lastKey=c.k;syncSweepIn();} if(["method","units","ownerBR","rentBR","design"].includes(c.k))syncSweepIn(); update(); if(!lock){trace(c.node,"down"); clearTimeout(w._t); w._t=setTimeout(untrace,900);} };
   const handler=()=>{ let v= c.type==="range"?parseFloat(input.value): c.type==="check"?input.checked: input.value; setV(c,S,focus,v); afterSet(); };
   input.addEventListener("input",handler); if(c.type!=="range") input.addEventListener("change",handler);
   if(c.type==="range") input.addEventListener("change",()=>{if(stretch(c,focus,parseFloat(input.value)))syncControls();});
@@ -1874,6 +1900,18 @@ function renderAppraisal(){
   document.getElementById("apprNote").innerHTML=`In ${focus}, the base case (${usdK(nh[1].fmv)}) leaves a remaining developer gap of <b>${usdK(nh[1].remain)}</b> and a sales gap of <b>${usdK(nh[1].salesGap)}</b>, against <b>${usdK(nh[0].remain)}</b> and <b>${usdK(nh[0].salesGap)}</b> at the existing-home value and <b>${usdK(nh[2].remain)}</b> and <b>${usdK(nh[2].salesGap)}</b> at the $420K precedent. Property tax is assessed on ${({fmv:"the appraised value, as Connecticut law requires",cama:"the existing-home value (the restricted-value test case)",custom:"your custom value"})[S.shared.taxBasis]}. Highlighted cells are the case currently driving the page.`;
 }
 
+
+const DESIGN_ROWS=[["Units · bedrooms","_prog","txt"],["Net sq ft (owner + rentals)","_net","num"],["Gross sq ft","gsf","num"],["Total development cost (TDC)","tdc","usd"],["TDC per unit","tdcUnit","usd"],["TDC per gross sq ft","tdcPSF","usd"],["Appraised value (as set)","fmv","usd"],["Rent collected per rental, per month","rent","usd"],["Developer gap","devGap","usd"],["Remaining developer gap","remain","usd"],["Total subsidy needed","subNeed","usd"],["Subsidy needed per unit","_subU","usd"],["Owner's net monthly cost","net","usd"],["Net cost as % of income","netPct","pct1"]];
+function designResult(St,city,d){const T=clone(St);applyDesign(T,d.name);const R=computeCity(T,city);R._prog=d.units+" · "+d.ownerBR+" owner + "+(d.units-1)+" × "+d.rentBR;R._net=d.oSF+(d.units-1)*d.rSF;R._subU=R.subNeed/d.units;return R;}
+function renderDesigns(){
+  const el=document.getElementById("designTbl");if(!el)return;
+  const cur=designOf(S);const Rs=DESIGNS.map(d=>designResult(S,focus,d));
+  const fm={txt:x=>esc(x),num:x=>Math.round(x).toLocaleString(),usd:x=>usd(x),pct1:x=>pct(x,1)};
+  const head=`<thead><tr><th>Result, ${esc(focus)}</th>${DESIGNS.map(d=>`<th${d.name===cur?' class="cur"':""}>${esc(d.name)}${d.est?" *":""}</th>`).join("")}</tr></thead>`;
+  const body=DESIGN_ROWS.map(([l,k,f])=>`<tr class="${["remain","subNeed","_subU"].includes(k)?"key":""}"><td>${termWrap(l)}</td>${Rs.map((R,i)=>`<td class="num${DESIGNS[i].name===cur?" cur":""}">${fm[f](R[k])}</td>`).join("")}</tr>`).join("");
+  el.className="ho"; el.innerHTML=head+`<tbody>${body}</tbody>`;
+  document.getElementById("designNote").innerHTML=`* Size estimated from the drawing dimensions; Reframe's sheets don't label total areas. Areas come from Reframe's standard plan sets (concept drawings, not for construction). Cost per sq ft uses the same manufacturer placeholders for every design, so only size and unit count differ. Reframe also has single-family types (bungalow, farmhouse, 3-story townhouse), ADUs and a double triple-decker that this two-family-or-more model doesn't cover; they're listed in the design workbook. Current design: <b>${esc(cur)}</b>.`;
+}
 /* --- research slots --- */
 function renderNY(){
   const rows=CTRL.filter(c=>c.ny);
@@ -1979,7 +2017,7 @@ function renderPresent(){
 /* --- Build it mode --- */
 const NYK=["phase2","waiver","abate"];
 const BSTEPS=[
- {t:"Building and household",keys:c=>c.g==="scn",bp:[],
+ {t:"Building and household",keys:c=>c.g==="scn",bp:["designs"],
   x:R=>`Start with what you're building and who it's for. The base case is a ${S.shared.units}-unit building: a ${S.shared.ownerBR} owner unit${S.shared.units>1?` plus ${S.shared.units-1} ${S.shared.rentBR} rental${S.shared.units>2?"s":""}`:""}. The owner earns ${pct(S.shared.ownerAMI)} of area median income, <b>${usd(R.income)}</b> a year in ${focus} for a household of ${S.shared.hhSize}.`,
   dec:["How many units, and which bedroom mix? (DOH's homeownership initiative excludes 3+ unit buildings.)","Who is the buyer: what income target and household size?","What rent tier for the rental unit, and should it be capped at market rent?"],
   res:[["income","Owner income","usd",1],["gsf","Gross sq ft","sf",0],["rentNet","AMI rent limit (net)","mo",1]]},
@@ -2214,7 +2252,7 @@ function fileStamp(){const d=new Date();return d.getFullYear()+"-"+String(d.getM
 /* ===================== UPDATE ===================== */
 function update(noPulse){
   recompute(); computeImpacts(); if(noPulse) PREV=null;
-  syncControls(); renderKPIs(); renderFlow(); renderInspector(); renderFacts(); renderStack(); renderCmp(); renderRules(); renderHomeowner(); renderAppraisal(); renderScale(); renderFeatures(); renderPortfolio(); renderNY();
+  syncControls(); renderKPIs(); renderFlow(); renderInspector(); renderFacts(); renderStack(); renderCmp(); renderRules(); renderHomeowner(); renderAppraisal(); renderDesigns(); renderScale(); renderFeatures(); renderPortfolio(); renderNY();
   if(mode==="explore"){renderSweep();renderTornado();}
   if(mode==="explain"){renderStepper(); if(stepLock) highlightSet(stepLock);}
   if(mode==="present") renderPresent();
