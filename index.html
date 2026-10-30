@@ -351,6 +351,7 @@ table.ivt details.whyd[open] summary .cut{display:none}
 table.ivt tr.chg td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 table.ivt td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
 table.ivt .nm{font-weight:600;min-width:200px}
+table.ivt td.cat{min-width:150px;max-width:200px}
 table.ivt .grp{font-size:.72rem;color:var(--ink-3);font-weight:400;display:block}
 table.ivt .why{color:var(--ink-2);min-width:260px;max-width:420px}
 table.ivt td.srcs a{color:var(--accent)}
@@ -2430,7 +2431,7 @@ function ivRows(){
     const sub=(GROUPS.find(g=>g.id===c.g)||{}).subs; const sl=sub&&c.sub?(sub.find(x=>x[0]===c.sub)||[])[1]:"";
     const im=ivImpact(c,focus);
     const srcs=r?(r.src||[]).filter(k=>SRC[k]).map(k=>SRC[k]):[];
-    return {c,k:c.k,name:lbl(c),group:GL[c.g]||c.g,sub:sl||"",stat:ivStatus(c),v,d,changed,out,r,im,mag:im.mag||0,dir:im.dir||0,srcs,why:c.why||"",scope:c.scope==="city"?"This city":"All cities",ov:isOv(S,c,focus)};
+    return {c,k:c.k,name:lbl(c),group:GL[c.g]||c.g,sub:sl||"",gi:GROUPS.findIndex(g=>g.id===c.g),si:sub&&c.sub?Math.max(0,sub.findIndex(x=>x[0]===c.sub))+1:0,ci:CTRL.indexOf(c),stat:ivStatus(c),v,d,changed,out,r,im,mag:im.mag||0,dir:im.dir||0,srcs,why:c.why||"",scope:c.scope==="city"?"This city":"All cities",ov:isOv(S,c,focus)};
   });
 }
 function ivFmtImp(x){const mo=IV.t==="net";return (mo?usd(x)+"/mo":usdK(x));}
@@ -2446,11 +2447,11 @@ function renderInputsView(){
   const q=IV.q.trim().toLowerCase();
   let rows=all.filter(r=>(!IV.stat||r.stat===IV.stat)&&(!IV.g||r.c.g===IV.g)&&(!IV.chg||r.changed)&&(!IV.out||r.out)&&
     (!q||(r.name+" "+r.group+" "+r.sub+" "+r.why+" "+r.srcs.map(x=>x.t).join(" ")).toLowerCase().includes(q)));
-  const SO={imp:r=>r.mag,name:r=>r.name.toLowerCase(),group:r=>r.group+"|"+r.sub,stat:r=>["ph","ny","ch","src"].indexOf(r.stat),val:r=>typeof r.v==="number"?r.v:String(r.v),chg:r=>(r.changed?2:0)+(r.out?1:0),src:r=>r.srcs.length,scope:r=>r.scope};
+  const SO={imp:r=>r.mag,name:r=>r.name.toLowerCase(),group:r=>r.gi*1e6+r.si*1e3+r.ci,stat:r=>["ph","ny","ch","src"].indexOf(r.stat),val:r=>typeof r.v==="number"?r.v:String(r.v),chg:r=>(r.changed?2:0)+(r.out?1:0),src:r=>r.srcs.length,scope:r=>r.scope};
   const f=SO[IV.sort]||SO.imp; rows.sort((a,b)=>{const x=f(a),y=f(b);return (x<y?-1:x>y?1:0)*IV.dir||a.name.localeCompare(b.name);});
   const maxMag=Math.max(1e-9,...rows.map(r=>r.mag));
   const tl=(IV_T.find(x=>x[0]===IV.t)||IV_T[0])[1].toLowerCase();
-  const H=[["name","Input"],["stat","Status"],["val","Value now"],["chg","Default · changed"],[null,"Researched range"],["imp",`Impact on ${tl}`],["src","Sources"],["scope","Applies to"],[null,"What it is"]];
+  const H=[["name","Input"],["group","Category"],["stat","Status"],["val","Value now"],["chg","Default · changed"],[null,"Researched range"],["imp",`Impact on ${tl}`],["src","Sources"],["scope","Applies to"],[null,"What it is"]];
   tbl.innerHTML=`<caption class="sr-only">All inputs, sortable</caption><thead><tr>${H.map(([k,l])=>k?`<th aria-sort="${IV.sort===k?(IV.dir>0?"ascending":"descending"):"none"}"><button type="button" data-sort="${k}">${esc(l)}</button></th>`:`<th>${esc(l)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>{
     const c=r.c, id="iv-"+c.k;
     let val;
@@ -2462,7 +2463,8 @@ function renderInputsView(){
     const w=Math.round(60*r.mag/maxMag);
     const imp=r.mag<0.5?`<span class="note">no effect now</span>`:`<span class="ivbar"><span>${r.im.how==="opts"||IV.m==="range"?"range ":r.dir>0?"+":r.dir<0?"−":"±"}${ivFmtImp(r.mag)}</span><i class="${r.dir>0?"up":r.dir<0?"dn":""}" style="width:${w}px"></i></span>`;
     const src=r.srcs.length?r.srcs.map(x=>x.u?`<a href="${x.u}" target="_blank" rel="noopener">${esc(x.t.split(":")[0])}</a>`:esc(x.t.split(":")[0])).join("; "):`<span class="note">${r.stat==="ph"?"Placeholder: no source yet":"—"}</span>`;
-    return `<tr class="${r.changed?"chg":""}"><td class="nm">${termWrap(r.name)}<span class="grp">${esc(r.group)}${r.sub?" · "+esc(r.sub):""}</span><button class="linkbtn ivgo" data-go="${c.k}">Show in the model</button></td>
+    return `<tr class="${r.changed?"chg":""}"><td class="nm">${termWrap(r.name)}<button class="linkbtn ivgo" data-go="${c.k}">Show in the model</button></td>
+      <td class="cat">${esc(r.group)}${r.sub?`<span class="grp">${esc(r.sub)}</span>`:""}</td>
       <td><span class="tag ${r.stat}">${esc(CONF_LABEL[r.stat]||r.stat)}</span></td>
       <td class="num">${val}</td>
       <td class="num">${esc(fmtCtl(c,r.d))}${r.changed?`<span class="grp">changed${r.ov?" · "+esc(focus)+" only":""}</span>`:""}${r.out?`<span class="tag warn">Outside range</span>`:""}</td>
