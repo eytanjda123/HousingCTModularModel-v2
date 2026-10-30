@@ -316,6 +316,52 @@ table.left td,table.left th{text-align:left}
 </style></head><body>
 
 <style>
+#inputsView{display:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+table.ivt .ivgo{display:block;margin-top:3px}
+body.mode-inputs .shell{grid-template-columns:minmax(0,1fr)}
+body.mode-inputs .rail, body.mode-inputs main>section:not(#inputsView), body.mode-inputs .foot{display:none!important}
+body.mode-inputs #inputsView{display:flex;flex-direction:column;gap:12px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:20px 22px}
+.iv-top{display:flex;gap:18px;justify-content:space-between;flex-wrap:wrap;align-items:flex-start}
+.iv-top h2{margin:4px 0 6px}
+.iv-top .note{max-width:70ch}
+.iv-sum{display:flex;gap:6px;flex-wrap:wrap}
+.iv-sum button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1px solid var(--rule);background:var(--paper);border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit;color:var(--ink)}
+.iv-sum button b{font-family:var(--f-mono);font-size:1.15rem}
+.iv-sum button small{font-size:.72rem;color:var(--ink-2)}
+.iv-sum button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.iv-tools{display:flex;gap:10px 14px;flex-wrap:wrap;align-items:flex-end}
+.iv-f{display:flex;flex-direction:column;gap:3px;font-size:.72rem;color:var(--ink-2);font-weight:600}
+.iv-f input,.iv-f select{font:inherit;font-size:.85rem;font-weight:400;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:5px 8px;min-width:150px}
+.iv-c{display:flex;gap:6px;align-items:center;font-size:.82rem;padding-bottom:6px}
+.iv-wrap{margin-top:0;max-height:calc(100vh - 250px);overflow:auto;border:1px solid var(--rule);border-radius:8px}
+table.ivt{width:100%;border-collapse:collapse;font-size:.82rem}
+table.ivt th{position:sticky;top:0;z-index:1;background:var(--sheet);text-align:left;font-size:.72rem;color:var(--ink-2);font-weight:600;padding:8px;border-bottom:1px solid var(--rule);white-space:nowrap}
+table.ivt th button{all:unset;cursor:pointer}
+table.ivt th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+table.ivt th[aria-sort="ascending"] button::after{content:" ▲";font-size:.6rem}
+table.ivt th[aria-sort="descending"] button::after{content:" ▼";font-size:.6rem}
+table.ivt td{padding:7px 8px;border-bottom:1px solid var(--rule-2);vertical-align:top;text-align:left;font-weight:400}
+.brand{flex:1 1 320px}
+table.ivt .tag{display:inline-block;width:auto;white-space:nowrap}
+table.ivt details.whyd summary{cursor:pointer;list-style:none}
+table.ivt details.whyd summary::-webkit-details-marker{display:none}
+table.ivt details.whyd summary .more{color:var(--accent);font-size:.72rem;margin-left:4px}
+table.ivt details.whyd[open] summary .cut{display:none}
+table.ivt tr.chg td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+table.ivt td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+table.ivt .nm{font-weight:600;min-width:200px}
+table.ivt .grp{font-size:.72rem;color:var(--ink-3);font-weight:400;display:block}
+table.ivt .why{color:var(--ink-2);min-width:260px;max-width:420px}
+table.ivt td.srcs a{color:var(--accent)}
+table.ivt td.srcs{min-width:160px;max-width:260px}
+table.ivt input.ivv{width:96px;font:inherit;font-family:var(--f-mono);text-align:right;background:var(--input-bg);color:var(--input-fg);border:1px solid var(--rule);border-radius:4px;padding:3px 6px}
+table.ivt select.ivv{font:inherit;max-width:190px;background:var(--input-bg);color:var(--input-fg);border:1px solid var(--rule);border-radius:4px;padding:3px 4px}
+.ivbar{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.ivbar i{display:block;height:8px;border-radius:2px;background:var(--accent);min-width:1px}
+.ivbar i.up{background:var(--bad)} .ivbar i.dn{background:var(--good)}
+.ivgo{font-size:.72rem}
+@media (max-width:700px){body.mode-inputs #inputsView{padding:14px 12px}.iv-f input,.iv-f select{min-width:0;width:100%}.iv-f{flex:1 1 140px}}
 :root{--s-hb:#7A5BB5;--s-ddoh:#3359A8;--side-b:#7A5BB5;--side-d:#0D8577;--s-nmtc:#B07A1E}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--s-hb:#A58BE0;--s-ddoh:#5C80D0;--side-b:#A58BE0;--side-d:#3AA898;--s-nmtc:#D9A441}}
 :root[data-theme="dark"]{--s-hb:#A58BE0;--s-ddoh:#5C80D0;--side-b:#A58BE0;--side-d:#3AA898;--s-nmtc:#D9A441}
@@ -415,6 +461,7 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
         <button id="m-present" aria-pressed="false" title="Large step-by-step view for a projector"><b>Present</b><small>for a room</small></button>
         <button id="m-explain" aria-pressed="false" title="Walk the input-to-output map one step at a time"><b>Explain</b><small>how it works</small></button>
         <button id="m-explore" aria-pressed="true" title="Every input and every panel at once"><b>Explore</b><small>everything</small></button>
+        <button id="m-inputs" aria-pressed="false" title="Every input in one sortable table: status, source, range and impact"><b>Inputs</b><small>sort &amp; audit</small></button>
       </div>
     </div>
     <div class="navgrp">
@@ -455,6 +502,26 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
         <div class="pz-mapbox"><svg id="pzsvg" role="img" aria-label="This step's part of the model"></svg><p class="pz-legend"></p></div>
       </div>
       <div class="pz-res" id="pzRes"></div>
+    </section>
+
+    <section id="inputsView" aria-labelledby="ivH">
+      <div class="iv-top">
+        <div><span class="eyebrow" id="ivEyebrow"></span><h2 id="ivH">Every input: what it is, where it comes from, and what it moves</h2>
+        <p class="note">One row per input, live: change a value in the table and every result updates. Click a column heading to sort. Impact is how much the chosen result changes when the input moves 10% (or one step), or across its researched range, in the focus city.</p></div>
+        <div class="iv-sum" id="ivSum"></div>
+      </div>
+      <div class="iv-tools">
+        <label class="iv-f">Search<input type="search" id="ivQ" placeholder="Name, source or note"></label>
+        <label class="iv-f">Category<select id="ivG"></select></label>
+        <label class="iv-f">Impact on<select id="ivT"></select></label>
+        <label class="iv-f">Measured by<select id="ivM"><option value="pct">10% change (or one step)</option><option value="range">Across the researched range</option></select></label>
+        <label class="iv-c"><input type="checkbox" id="ivChg"> Changed only</label>
+        <label class="iv-c"><input type="checkbox" id="ivOut"> Outside researched range</label>
+        <span style="flex:1"></span>
+        <button class="btn sm" id="ivCsv" type="button">Download CSV</button>
+      </div>
+      <p class="note" id="ivCount" aria-live="polite"></p>
+      <div class="tblwrap iv-wrap"><table class="ivt" id="ivTbl"></table></div>
     </section>
 
     <section id="build" aria-live="polite">
@@ -1100,7 +1167,7 @@ function deltaClass(d,good){ if(!good) return "neu"; return (d*good>0)?"good":"b
 /* ===================== STATE ===================== */
 let S=clone(DEFAULTS), BASE=clone(DEFAULTS), baseLabel="defaults";
 let focus="New Haven", mode="explore", lastKey="volume", selNode="o_remain", step=0, pzStep=0;
-try{const m=localStorage.getItem(LS+"mode"); if(["build","present","explain","explore"].includes(m)) mode=m; const f=localStorage.getItem(LS+"city"); if(CITIES.includes(f)) focus=f;}catch(e){}
+try{const m=localStorage.getItem(LS+"mode"); if(["build","present","explain","explore","inputs"].includes(m)) mode=m; const f=localStorage.getItem(LS+"city"); if(CITIES.includes(f)) focus=f;}catch(e){}
 
 /* ===================== CONTROLS ===================== */
 const SH=k=>({get:(St)=>St.shared[k],set:(St,c,v)=>{St.shared[k]=v;}});
@@ -2131,8 +2198,8 @@ function renderBuild(){
 }
 function setMode(m){
   mode=m; try{localStorage.setItem(LS+"mode",m);}catch(e){}
-  document.body.classList.toggle("mode-explain",m==="explain"); document.body.classList.toggle("mode-present",m==="present"); document.body.classList.toggle("mode-build",m==="build");
-  ["build","present","explain","explore"].forEach(x=>document.getElementById("m-"+x).setAttribute("aria-pressed",m===x));
+  document.body.classList.toggle("mode-explain",m==="explain"); document.body.classList.toggle("mode-present",m==="present"); document.body.classList.toggle("mode-build",m==="build"); document.body.classList.toggle("mode-inputs",m==="inputs");
+  ["build","present","explain","explore","inputs"].forEach(x=>document.getElementById("m-"+x).setAttribute("aria-pressed",m===x));
   document.getElementById("stepper").hidden=m!=="explain";
   if(m!=="build") document.querySelectorAll("main>section.panel[data-bp]").forEach(p=>p.classList.remove("bshow"));
   if(m==="build"){applyBuildRail();}
@@ -2342,6 +2409,105 @@ async function download(blob,name){
 const onPublic=true;
 function fileStamp(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 
+
+/* ===================== INPUTS VIEW (sort & audit) ===================== */
+const IV_T=[["remain","Remaining developer gap"],["devGap","Developer gap"],["salesGap","Sales gap"],["subNeed","Total subsidy needed"],["net","Owner's net monthly cost"],["tdc","Total development cost"]];
+const IV_STAT=[["src","Sourced"],["ph","Placeholder"],["ch","Team choice"],["ny","Not yet modeled"]];
+let IV={q:"",g:"",t:"remain",m:"pct",chg:false,out:false,stat:"",sort:"imp",dir:-1};
+try{const o=JSON.parse(localStorage.getItem(LS+"iv")||"null");if(o)IV=Object.assign(IV,o,{q:""});}catch(e){}
+function ivSave(){try{localStorage.setItem(LS+"iv",JSON.stringify(IV));}catch(e){}}
+function ivStatus(c){return c.ny?"ny":c.conf;}
+function ivImpact(c,city){
+  const t0=impTarget,m0=impMode; impTarget=IV.t; impMode=IV.m;
+  try{ const r=ctlImpact(c,city); return r; } catch(e){ return {mag:0,dir:0,how:""}; } finally{ impTarget=t0; impMode=m0; }
+}
+function ivRows(){
+  const GL={};GROUPS.forEach(g=>GL[g.id]=g.label);
+  return CTRL.filter(c=>c.k!=="rentDollar").map(c=>{
+    const v=getV(c,S,focus), d=defV(c,focus), r=rg(c,focus);
+    const changed=JSON.stringify(v)!==JSON.stringify(d)||(c.ny&&c.on(S,focus)!==c.on(DEFAULTS,focus));
+    const out=c.type==="range"&&r&&!c.discrete&&(v<r.lo-1e-9||v>r.hi+1e-9);
+    const sub=(GROUPS.find(g=>g.id===c.g)||{}).subs; const sl=sub&&c.sub?(sub.find(x=>x[0]===c.sub)||[])[1]:"";
+    const im=ivImpact(c,focus);
+    const srcs=r?(r.src||[]).filter(k=>SRC[k]).map(k=>SRC[k]):[];
+    return {c,k:c.k,name:lbl(c),group:GL[c.g]||c.g,sub:sl||"",stat:ivStatus(c),v,d,changed,out,r,im,mag:im.mag||0,dir:im.dir||0,srcs,why:c.why||"",scope:c.scope==="city"?"This city":"All cities",ov:isOv(S,c,focus)};
+  });
+}
+function ivFmtImp(x){const mo=IV.t==="net";return (mo?usd(x)+"/mo":usdK(x));}
+function renderInputsView(){
+  const tbl=document.getElementById("ivTbl"); if(!tbl) return;
+  document.getElementById("ivEyebrow").textContent=`Inputs · ${focus}`;
+  const all=ivRows();
+  // summary chips (status filters)
+  const cnt=k=>all.filter(r=>r.stat===k).length;
+  document.getElementById("ivSum").innerHTML=[["","All inputs",all.length],...IV_STAT.map(([k,l])=>[k,l,cnt(k)])].map(([k,l,n])=>`<button type="button" data-st="${k}" aria-pressed="${IV.stat===k}"><b>${n}</b><small>${esc(l)}</small></button>`).join("")
+    +`<button type="button" data-st="__chg" aria-pressed="${IV.chg}"><b>${all.filter(r=>r.changed).length}</b><small>Changed</small></button><button type="button" data-st="__out" aria-pressed="${IV.out}"><b>${all.filter(r=>r.out).length}</b><small>Outside range</small></button>`;
+  document.querySelectorAll("#ivSum button").forEach(b=>b.onclick=()=>{const k=b.dataset.st;if(k==="__chg")IV.chg=!IV.chg;else if(k==="__out")IV.out=!IV.out;else IV.stat=IV.stat===k?"":k;ivSave();syncIvTools();renderInputsView();});
+  const q=IV.q.trim().toLowerCase();
+  let rows=all.filter(r=>(!IV.stat||r.stat===IV.stat)&&(!IV.g||r.c.g===IV.g)&&(!IV.chg||r.changed)&&(!IV.out||r.out)&&
+    (!q||(r.name+" "+r.group+" "+r.sub+" "+r.why+" "+r.srcs.map(x=>x.t).join(" ")).toLowerCase().includes(q)));
+  const SO={imp:r=>r.mag,name:r=>r.name.toLowerCase(),group:r=>r.group+"|"+r.sub,stat:r=>["ph","ny","ch","src"].indexOf(r.stat),val:r=>typeof r.v==="number"?r.v:String(r.v),chg:r=>(r.changed?2:0)+(r.out?1:0),src:r=>r.srcs.length,scope:r=>r.scope};
+  const f=SO[IV.sort]||SO.imp; rows.sort((a,b)=>{const x=f(a),y=f(b);return (x<y?-1:x>y?1:0)*IV.dir||a.name.localeCompare(b.name);});
+  const maxMag=Math.max(1e-9,...rows.map(r=>r.mag));
+  const tl=(IV_T.find(x=>x[0]===IV.t)||IV_T[0])[1].toLowerCase();
+  const H=[["name","Input"],["stat","Status"],["val","Value now"],["chg","Default · changed"],[null,"Researched range"],["imp",`Impact on ${tl}`],["src","Sources"],["scope","Applies to"],[null,"What it is"]];
+  tbl.innerHTML=`<caption class="sr-only">All inputs, sortable</caption><thead><tr>${H.map(([k,l])=>k?`<th aria-sort="${IV.sort===k?(IV.dir>0?"ascending":"descending"):"none"}"><button type="button" data-sort="${k}">${esc(l)}</button></th>`:`<th>${esc(l)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>{
+    const c=r.c, id="iv-"+c.k;
+    let val;
+    if(c.ny&&!c.on(S,focus)) val=`<span class="note">Off</span> <button class="linkbtn" data-ivon="${c.k}">Include</button>`;
+    else if(c.type==="range") val=`<input class="ivv" id="${id}" data-k="${c.k}" inputmode="decimal" value="${toDisp(c,r.v)}" aria-label="${esc(r.name)}"> <span class="note">${unitOf(c)}</span>`;
+    else if(c.type==="select") val=`<select class="ivv" id="${id}" data-k="${c.k}" aria-label="${esc(r.name)}">${c.opts.map(o=>`<option${o===r.v?" selected":""}>${esc(o)}</option>`).join("")}</select>`;
+    else if(c.type==="check") val=`<label class="switch"><input type="checkbox" class="ivv" id="${id}" data-k="${c.k}" ${r.v?"checked":""}> On</label>`;
+    const rng=r.r?`${r.r.hi-r.r.lo<1e-12?esc(fmtCtl(c,r.r.lo)):esc(fmtCtl(c,r.r.lo))+" – "+esc(fmtCtl(c,r.r.hi))}<span class="grp">${esc(KIND[r.r.kind]||"")}</span>`:`<span class="note">—</span>`;
+    const w=Math.round(60*r.mag/maxMag);
+    const imp=r.mag<0.5?`<span class="note">no effect now</span>`:`<span class="ivbar"><span>${r.im.how==="opts"||IV.m==="range"?"range ":r.dir>0?"+":r.dir<0?"−":"±"}${ivFmtImp(r.mag)}</span><i class="${r.dir>0?"up":r.dir<0?"dn":""}" style="width:${w}px"></i></span>`;
+    const src=r.srcs.length?r.srcs.map(x=>x.u?`<a href="${x.u}" target="_blank" rel="noopener">${esc(x.t.split(":")[0])}</a>`:esc(x.t.split(":")[0])).join("; "):`<span class="note">${r.stat==="ph"?"Placeholder: no source yet":"—"}</span>`;
+    return `<tr class="${r.changed?"chg":""}"><td class="nm">${termWrap(r.name)}<span class="grp">${esc(r.group)}${r.sub?" · "+esc(r.sub):""}</span><button class="linkbtn ivgo" data-go="${c.k}">Show in the model</button></td>
+      <td><span class="tag ${r.stat}">${esc(CONF_LABEL[r.stat]||r.stat)}</span></td>
+      <td class="num">${val}</td>
+      <td class="num">${esc(fmtCtl(c,r.d))}${r.changed?`<span class="grp">changed${r.ov?" · "+esc(focus)+" only":""}</span>`:""}${r.out?`<span class="tag warn">Outside range</span>`:""}</td>
+      <td class="num">${rng}</td><td class="num">${imp}</td><td class="srcs">${src}</td><td>${esc(r.scope)}</td><td class="why">${r.why.length>170?`<details class="whyd"><summary><span class="cut">${esc(r.why.slice(0,160).replace(/\s+\S*$/,""))}…</span><span class="more">more</span></summary>${esc(r.why)}</details>`:esc(r.why)}</td></tr>`;}).join("")}</tbody>`;
+  document.getElementById("ivCount").textContent=`Showing ${rows.length} of ${all.length} inputs for ${focus}. Impact: ${IV.m==="pct"?"change in the "+tl+" when the input moves up 10% (counts move one step; + means it rises)":"spread of the "+tl+" across the input's researched range"}.`;
+  tbl.querySelectorAll("th button[data-sort]").forEach(b=>b.onclick=()=>{const k=b.dataset.sort;if(IV.sort===k)IV.dir=-IV.dir;else{IV.sort=k;IV.dir=(k==="name"||k==="group"||k==="stat"||k==="scope")?1:-1;}ivSave();renderInputsView();const nb=tbl.querySelector(`th button[data-sort="${k}"]`);if(nb)nb.focus();});
+  tbl.querySelectorAll(".ivv").forEach(el=>{const c=CTRL_BY[el.dataset.k];
+    const commit=()=>{let v;if(c.type==="range"){v=fromDisp(c,el.value);if(v===null){renderInputsView();return;}}else if(c.type==="check")v=el.checked;else v=el.value;
+      const fid=el.id;setV(c,S,focus,v);if(c.type==="range")stretch(c,focus,v);update();const n=document.getElementById(fid);if(n&&c.type==="range"){n.focus();n.select&&n.select();}};
+    if(c.type==="range"){el.addEventListener("change",commit);el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();commit();}});}else el.addEventListener("change",commit);});
+  tbl.querySelectorAll("[data-ivon]").forEach(b=>b.onclick=()=>{const c=CTRL_BY[b.dataset.ivon];c.toggle(S,focus,true);update();});
+  tbl.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const k=b.dataset.go;setMode("explore");setTimeout(()=>scrollRailToCtl(k),60);});
+}
+function syncIvTools(){
+  const g=document.getElementById("ivG"); if(!g.options.length) g.innerHTML=`<option value="">All categories</option>`+GROUPS.map(x=>`<option value="${x.id}">${esc(x.label)}</option>`).join("");
+  const t=document.getElementById("ivT"); if(!t.options.length) t.innerHTML=IV_T.map(([k,l])=>`<option value="${k}">${esc(l)}</option>`).join("");
+  g.value=IV.g; t.value=IV.t; document.getElementById("ivM").value=IV.m; document.getElementById("ivChg").checked=IV.chg; document.getElementById("ivOut").checked=IV.out; document.getElementById("ivQ").value=IV.q;
+}
+(function initIv(){
+  syncIvTools(); let tq;
+  document.getElementById("ivQ").addEventListener("input",e=>{IV.q=e.target.value;clearTimeout(tq);tq=setTimeout(renderInputsView,150);});
+  document.getElementById("ivG").onchange=e=>{IV.g=e.target.value;ivSave();renderInputsView();};
+  document.getElementById("ivT").onchange=e=>{IV.t=e.target.value;ivSave();renderInputsView();};
+  document.getElementById("ivM").onchange=e=>{IV.m=e.target.value;ivSave();renderInputsView();};
+  document.getElementById("ivChg").onchange=e=>{IV.chg=e.target.checked;ivSave();renderInputsView();};
+  document.getElementById("ivOut").onchange=e=>{IV.out=e.target.checked;ivSave();renderInputsView();};
+  document.getElementById("ivCsv").onclick=async()=>{
+    const rows=ivRows(), tl=(IV_T.find(x=>x[0]===IV.t)||IV_T[0])[1];
+    const q=x=>`"${String(x).replace(/"/g,'""')}"`;
+    const head=["Input","Category","Sub-section","Status","Value now ("+focus+")","Default","Changed","Outside researched range","Range low","Range high","Range basis",`Impact on ${tl} (${IV.m==="pct"?"10% change":"across range"})`,"Direction","Applies to","Sources","Source links","What it is"];
+    const lines=[head.map(q).join(",")].concat(rows.map(r=>[r.name,r.group,r.sub,CONF_LABEL[r.stat]||r.stat,fmtCtl(r.c,r.v),fmtCtl(r.c,r.d),r.changed?"Yes":"No",r.out?"Yes":"No",r.r?fmtCtl(r.c,r.r.lo):"",r.r?fmtCtl(r.c,r.r.hi):"",r.r?KIND[r.r.kind]||"":"",Math.round(r.mag),r.dir>0?"raises":r.dir<0?"lowers":"",r.scope,r.srcs.map(x=>x.t).join("; "),r.srcs.map(x=>x.u||"").filter(Boolean).join(" "),r.why].map(q).join(",")));
+    const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv"});
+    await download(blob,`Housing_CT_Prefab_Inputs_${focus.replace(/\s/g,"_")}_${fileStamp()}.csv`);
+  };
+})();
+function scrollRailToCtl(k){
+  const rail=document.querySelector(".rail"); const w=document.querySelector(`#controls .ctl[data-k="${k}"]`); if(!rail||!w) return;
+  let d=w.parentElement;while(d&&d!==rail){if(d.tagName==="DETAILS"&&!d.open)d.open=true;d=d.parentElement;}
+  requestAnimationFrame(()=>{
+    if(rail.scrollHeight>rail.clientHeight+4){const head=rail.querySelector(".rail-head"),off=(head?head.offsetHeight:0)+12;rail.scrollTo({top:Math.max(0,w.getBoundingClientRect().top-rail.getBoundingClientRect().top+rail.scrollTop-off)});window.scrollTo({top:0});}
+    else w.scrollIntoView({block:"center"});
+    w.classList.add("flash");setTimeout(()=>w.classList.remove("flash"),1400);
+    const inp=w.querySelector("input,select");if(inp)inp.focus({preventScroll:true});
+  });
+}
 /* ===================== UPDATE ===================== */
 function update(noPulse){
   recompute(); computeImpacts(); if(noPulse) PREV=null;
@@ -2350,6 +2516,7 @@ function update(noPulse){
   if(mode==="explain"){renderStepper(); if(stepLock) highlightSet(stepLock);}
   if(mode==="present") renderPresent();
   if(mode==="build") renderBuild();
+  if(mode==="inputs") renderInputsView();
   syncHash();
 }
 
@@ -2359,7 +2526,7 @@ buildCitySeg(); buildControls(); buildFlow(); buildSweepPickers(); renderGloss()
 document.getElementById("impT").value=impTarget;
 document.getElementById("impT").onchange=e=>{impTarget=e.target.value;try{localStorage.setItem(LS+"impT",impTarget);}catch(x){}update(true);};
 document.querySelectorAll("#impMode button").forEach(b=>b.onclick=()=>{impMode=b.dataset.m;try{localStorage.setItem(LS+"impM",impMode);}catch(x){}update(true);});
-["build","present","explain","explore"].forEach(m=>document.getElementById("m-"+m).onclick=()=>setMode(m));
+["build","present","explain","explore","inputs"].forEach(m=>document.getElementById("m-"+m).onclick=()=>setMode(m));
 document.getElementById("bPrev").onclick=()=>{if(bStep>0){bStep--;applyBuildRail();renderBuild();window.scrollTo({top:0});}};
 document.getElementById("bNext").onclick=()=>{bStep=(bStep+1)%BSTEPS.length;applyBuildRail();renderBuild();window.scrollTo({top:0});};
 document.getElementById("prevStep").onclick=()=>{if(step>0){step--;applyStep();}};
