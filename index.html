@@ -335,7 +335,7 @@ body.mode-present #present{width:min(100%, calc((100vh - var(--hdr,120px) - 22px
 #present .pz-mapbox.sum{border:0;background:none;padding:0}
 #present .pz-howbox{grid-area:how;min-height:0;overflow:hidden}
 /* Layout A: text and map on the left; settings and the worked-out notes in a side column */
-#present.pzl-a .pz-grid{grid-template-columns:minmax(0,73fr) minmax(0,27fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"text ctls" "map ctls" "map how"}
+#present.pzl-a .pz-grid{grid-template-columns:minmax(0,27fr) minmax(0,73fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"ctls text" "ctls map" "how map"}
 #present.pzl-a .pz-ctls{grid-template-columns:minmax(0,1fr)}
 #present.pzl-a .pz-howbox h3{display:block;font-size:1.9cqh;margin:0 0 1cqh;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
 #present.pzl-a .pz-how{display:flex;flex-direction:column;gap:1.3cqh}
@@ -551,7 +551,7 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
     <section id="present" aria-live="polite">
       <div class="pz-top">
         <div><span class="eyebrow" id="pzEyebrow"></span><h2 id="pzTitle"></h2></div>
-        <div class="step-nav"><div class="seg pzl-seg" role="group" aria-label="Slide layout"><button type="button" data-pzl="a">Layout A</button><button type="button" data-pzl="b">Layout B</button></div><div class="pz-dots" id="pzDots"></div><button class="btn" id="pzPrev">Back</button><button class="btn primary" id="pzNext">Next</button></div>
+        <div class="step-nav"><div class="pz-dots" id="pzDots"></div><button class="btn" id="pzPrev">Back</button><button class="btn primary" id="pzNext">Next</button></div>
       </div>
       <div class="pz-grid">
         <div class="pz-head"><p class="pz-text" id="pzText"></p><div class="pz-ctls" id="pzCtls"></div></div>
@@ -2166,7 +2166,7 @@ function pzWrap(text,font,maxW){
 }
 
 /* Present slide map: same box size on every step, sized to fill the slide */
-let PZL="a"; try{const v=localStorage.getItem(LS+"pzl"); if(v==="a"||v==="b") PZL=v;}catch(e){}
+const PZL="a"; // layout A chosen; layout B rules kept in CSS for reference
 const PZ_L={a:{NW:250,GX:50,GY:16,PAD:15,LS:22,VS:30,NS:0},b:{NW:280,GX:58,GY:16,PAD:15,LS:20,VS:28,NS:18}};
 function pzLayout(si,R,B){
   const L=PZ_L[PZL], st=STEPS[si];
@@ -2220,13 +2220,12 @@ function pzDrawMap(R,B){
   document.getElementById("pzHow").innerHTML=ids.map(id=>`<li><span class="n">${NUM[id]}</span><span><b>${esc(NB[id].label)}</b> = ${esc(PZ_HOW[id](R))}</span></li>`).join("");
   document.getElementById("pzHowBox").hidden=!ids.length||PZL==="b";
 }
-document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".pzl-seg button");if(!b)return;PZL=b.dataset.pzl;try{localStorage.setItem(LS+"pzl",PZL);}catch(x){}renderPresent();});
 let pzRz; window.addEventListener("resize",()=>{clearTimeout(pzRz);pzRz=setTimeout(()=>{if(mode==="present")renderPresent();},120);});
 function renderPresent(){
   document.getElementById("pzMapbox").classList.remove("sum"); document.getElementById("pzHowBox").hidden=false;
   pzNav();
   if(pzStep===PZ_LAST){renderSummary();return;}
-  document.querySelector(".pz-legend").textContent="Read left to right · arrows show what feeds what · yellow = the settings · white = worked out"+(PZL==="a"?" (explained at right)":" (the formula is in each box)")+" · dashed = from an earlier step";
+  document.querySelector(".pz-legend").textContent="Read left to right · arrows show what feeds what · yellow = the settings · white = worked out"+(PZL==="a"?" (explained at left)":" (the formula is in each box)")+" · dashed = from an earlier step";
   const st=STEPS[pzStep], R=CUR[focus], B=BAS[focus];
   document.getElementById("pzEyebrow").textContent=`Step ${pzStep+1} of ${STEPS.length} · ${focus}`;
   document.getElementById("pzTitle").textContent=st.t;
