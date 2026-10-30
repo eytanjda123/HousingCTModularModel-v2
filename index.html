@@ -326,45 +326,51 @@ body.mode-present #present{width:min(100%, calc((100vh - var(--hdr,120px) - 22px
 #present .pz-top h2{font-size:4.3cqh;margin:.2cqh 0 0;line-height:1.1}
 #present .pz-top .eyebrow{font-size:1.5cqh}
 #present .pz-top .btn{font-size:1.9cqh;padding:.8cqh 1.4cqh}
-#present .pz-grid{flex:1 1 auto;min-height:0;display:flex!important;flex-direction:column;align-items:stretch;gap:1.4cqh}
-#present .pz-head{flex:0 0 auto;display:grid;grid-template-columns:minmax(0,38fr) minmax(0,62fr);gap:2.2cqw;align-items:start}
-#present .pz-text{font-size:2.45cqh;line-height:1.4;max-width:none;margin:0}
-#present .pz-head .pz-ctls{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1cqh 1cqw}
-#pzCtls .ctl{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:.8cqh 1cqw}
-#pzCtls .ctl-meta{display:none}
-#pzCtls .ctl-l{font-size:1.85cqh;line-height:1.25}
-#pzCtls .numin{width:9em;font-size:1.85cqh}
-#pzCtls select{font-size:1.85cqh}
-#pzCtls .info{display:none}
-#present .pz-mapbox{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:10px;padding:1cqh 1cqw;background:var(--paper);overflow:hidden}
+#present .pz-grid{flex:1 1 auto;min-height:0;display:grid!important;align-items:stretch;gap:1.6cqh 1.8cqw}
+#present .pz-text,#present .pz-ctls,#present .pz-howbox{align-self:start}
+#present .pz-head{display:contents}
+#present .pz-text{grid-area:text;font-size:2.75cqh;line-height:1.38;max-width:none;margin:0}
+#present .pz-ctls{grid-area:ctls;margin:0;display:grid;gap:1cqh 1cqw;align-content:start}
+#present .pz-mapbox{grid-area:map;min-height:0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--rule);border-radius:12px;padding:1.4cqh 1.2cqw;background:var(--paper);overflow:hidden}
 #present .pz-mapbox.sum{border:0;background:none;padding:0}
-#pzsvg{flex:1 1 auto;min-height:0;width:100%;height:100%;min-width:0!important}
-#pzsvg .pl{font-size:17px}
-#pzsvg .pv{font-size:25px}
-#pzsvg .pd{font-size:15px}
+#present .pz-howbox{grid-area:how;min-height:0;overflow:hidden}
+/* Layout A: text and map on the left; settings and the worked-out notes in a side column */
+#present.pzl-a .pz-grid{grid-template-columns:minmax(0,73fr) minmax(0,27fr);grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"text ctls" "map ctls" "map how"}
+#present.pzl-a .pz-ctls{grid-template-columns:minmax(0,1fr)}
+#present.pzl-a .pz-howbox h3{display:block;font-size:1.9cqh;margin:0 0 1cqh;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
+#present.pzl-a .pz-how{display:flex;flex-direction:column;gap:1.3cqh}
+/* Layout B: text beside the settings; the map spans the slide, each box carries its own note */
+#present.pzl-b .pz-grid{grid-template-columns:minmax(0,40fr) minmax(0,60fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"text ctls" "map map"}
+#present.pzl-b .pz-ctls{grid-template-columns:repeat(2,minmax(0,1fr))}
+#present.pzl-b .pz-howbox{display:none}
+#present .pz-mapbox.sum{grid-column:1/-1}
+#pzCtls .ctl{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:.9cqh 1cqw}
+#pzCtls .ctl-meta,#pzCtls .info{display:none}
+#pzCtls .ctl-l{font-size:2.05cqh;line-height:1.25}
+#pzCtls .numin{width:8em;font-size:2.05cqh}
+#pzCtls select{font-size:2.05cqh}
+#pzsvg{flex:0 0 auto;min-width:0!important;max-width:100%}
+#pzsvg .pl{font-weight:500}
+#pzsvg .pnote{font-family:var(--f-body);fill:var(--ink-2)}
+#pzsvg .pn.input .pnote{fill:var(--input-fg)}
 #pzsvg .pe{stroke-width:2.6}
 #pzsvg .pah{fill:var(--flow)}
 #pzsvg .pnum circle{fill:var(--ink)}
-#pzsvg .pnum text{fill:var(--sheet);font-family:var(--f-body);font-size:14px;font-weight:700}
-#present .pz-legend{flex:0 0 auto;font-size:1.6cqh;margin:.6cqh 0 0}
-#present .pz-howbox{flex:0 0 auto}
-#present .pz-howbox h3{display:none}
-.pz-how{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7cqh 1.6cqw}
-.pz-how li{display:flex;gap:.8cqw;align-items:baseline;font-size:1.75cqh;line-height:1.3}
-.pz-how li .n{flex:0 0 auto;width:2.3cqh;height:2.3cqh;border-radius:50%;background:var(--ink);color:var(--sheet);font-weight:700;font-size:1.3cqh;display:inline-flex;align-items:center;justify-content:center;transform:translateY(.3cqh)}
+#pzsvg .pnum text{fill:var(--sheet);font-family:var(--f-body);font-size:15px;font-weight:700}
+#present .pz-legend{flex:0 0 auto;font-size:1.7cqh;margin:1cqh 0 0;align-self:stretch;text-align:center}
+.pz-how{margin:0;padding:0;list-style:none}
+.pz-how li{display:flex;gap:1cqh;align-items:baseline;font-size:2.15cqh;line-height:1.3}
+.pz-how li .n{flex:0 0 auto;width:2.8cqh;height:2.8cqh;border-radius:50%;background:var(--ink);color:var(--sheet);font-weight:700;font-size:1.55cqh;display:inline-flex;align-items:center;justify-content:center;transform:translateY(.4cqh)}
 .pz-how li b{font-weight:650}
+.pzl-seg{margin-right:10px} .pzl-seg button{font-size:1.6cqh;padding:.5cqh 1.1cqh}
 #present .pz-res{display:none}
 @media (max-width:900px){
   body.mode-present #present{width:auto;aspect-ratio:auto;overflow:visible;font-size:15px;padding:16px;gap:12px}
   #present .pz-top h2{font-size:1.5rem} #present .pz-text,#pzCtls .ctl-l,#pzCtls .numin,.pz-how li{font-size:1rem}
-  #present .pz-head{grid-template-columns:minmax(0,1fr)} #present .pz-head .pz-ctls{grid-template-columns:minmax(0,1fr)}
+  #present .pz-grid{display:flex!important;flex-direction:column} #present .pz-ctls{grid-template-columns:minmax(0,1fr)!important}
   .pz-how{grid-template-columns:minmax(0,1fr)} #pzsvg{height:auto;min-width:560px!important} #present .pz-mapbox{overflow-x:auto}
   #present .pz-legend{font-size:.85rem} .pz-how li .n{width:22px;height:22px;font-size:.75rem}
 }
-#pzCtls .ctl{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:10px 12px}
-#pzCtls .ctl-l{font-size:1rem}
-#pzCtls .numin{width:110px;font-size:1rem}
-#pzCtls select{font-size:1rem}
 #inputsView{display:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 table.ivt .ivgo{display:block;margin-top:3px}
@@ -545,7 +551,7 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
     <section id="present" aria-live="polite">
       <div class="pz-top">
         <div><span class="eyebrow" id="pzEyebrow"></span><h2 id="pzTitle"></h2></div>
-        <div class="step-nav"><div class="pz-dots" id="pzDots"></div><button class="btn" id="pzPrev">Back</button><button class="btn primary" id="pzNext">Next</button></div>
+        <div class="step-nav"><div class="seg pzl-seg" role="group" aria-label="Slide layout"><button type="button" data-pzl="a">Layout A</button><button type="button" data-pzl="b">Layout B</button></div><div class="pz-dots" id="pzDots"></div><button class="btn" id="pzPrev">Back</button><button class="btn primary" id="pzNext">Next</button></div>
       </div>
       <div class="pz-grid">
         <div class="pz-head"><p class="pz-text" id="pzText"></p><div class="pz-ctls" id="pzCtls"></div></div>
@@ -2158,57 +2164,76 @@ function pzWrap(text,font,maxW){
   const groups=str.includes(" · ")?pack(str.split(" · ")," · "):[str];
   return groups.flatMap(g=>fits(g)?[g]:pack(g.split(" ")," "));
 }
+
+/* Present slide map: same box size on every step, sized to fill the slide */
+let PZL="a"; try{const v=localStorage.getItem(LS+"pzl"); if(v==="a"||v==="b") PZL=v;}catch(e){}
+const PZ_L={a:{NW:250,GX:50,GY:16,PAD:15,LS:22,VS:30,NS:0},b:{NW:280,GX:58,GY:16,PAD:15,LS:20,VS:28,NS:18}};
+function pzLayout(si,R,B){
+  const L=PZ_L[PZL], st=STEPS[si];
+  const cs=getComputedStyle(document.documentElement), fb=(cs.getPropertyValue("--f-body")||"sans-serif").trim(), fm=(cs.getPropertyValue("--f-mono")||"monospace").trim();
+  const LF=`500 ${L.LS}px ${fb}`, VF=`600 ${L.VS}px ${fm}`, DF=`600 ${Math.round(L.VS*.6)}px ${fm}`, NF=`${L.NS}px ${fb}`;
+  const earlier=new Set(STEPS.slice(0,si).flatMap(x=>x.nodes)); const prior=new Set(st.nodes.filter(id=>earlier.has(id)));
+  const shown=[...st.nodes]; const cols=[...new Set(shown.map(id=>NB[id].col))].sort(); const colIdx=Object.fromEntries(cols.map((c,i)=>[c,i]));
+  const byCol={}; shown.forEach(id=>{const k=colIdx[NB[id].col];(byCol[k]=byCol[k]||[]).push(id);});
+  Object.values(byCol).forEach(a=>a.sort((p,q)=>POS[p].y-POS[q].y));
+  const NUM={}; let nn=0; Object.keys(byCol).sort((a,b)=>a-b).forEach(k=>byCol[k].forEach(id=>{const n=NB[id];if(n.type!=="input"&&!prior.has(id)&&PZ_HOW[id])NUM[id]=++nn;}));
+  const BOX={}, lh=Math.round(L.LS*1.22), vh=Math.round(L.VS*1.18), nh=Math.round(L.NS*1.3);
+  shown.forEach(id=>{const n=NB[id];const val=n.r?F[n.fmt](R[n.r]):n.v(R,focus);const dt=n.r?deltaText(R[n.r]-B[n.r],n.fmt):"";
+    const inner=L.NW-L.PAD*2; const lab=pzWrap(n.label,LF,inner-(NUM[id]?32:0)); const vl=pzWrap(val,VF,inner);
+    pzMeasure.font=VF; const lastW=pzMeasure.measureText(vl[vl.length-1]).width; pzMeasure.font=DF; const dW=dt?pzMeasure.measureText(dt).width:0;
+    const dtOwn=!!dt&&lastW+dW+14>inner;
+    const note=(L.NS&&NUM[id])?pzWrap("= "+PZ_HOW[id](R),NF,inner):[];
+    const h=L.PAD+lab.length*lh+6+vl.length*vh+(dtOwn?Math.round(L.VS*.7):0)+(note.length?6+note.length*nh:0)+L.PAD-4;
+    BOX[id]={val,dt,lab,vl,dtOwn,note,h};});
+  const colH=k=>byCol[k].reduce((a,id)=>a+BOX[id].h,0)+(byCol[k].length-1)*L.GY;
+  const Hh=Math.max(...Object.keys(byCol).map(colH))+8, Ww=cols.length*L.NW+(cols.length-1)*L.GX+70;
+  const P={}; Object.keys(byCol).forEach(k=>{let y=(Hh-colH(k))/2;byCol[k].forEach(id=>{P[id]={x:4+k*(L.NW+L.GX),y};y+=BOX[id].h+L.GY;});});
+  return {L,LF,VF,DF,NF,lh,vh,nh,shown,prior,BOX,P,Ww,Hh,NUM};
+}
+function pzDrawMap(R,B){
+  const svg=document.getElementById("pzsvg"), box=document.getElementById("pzMapbox");
+  document.getElementById("present").classList.toggle("pzl-b",PZL==="b"); document.getElementById("present").classList.toggle("pzl-a",PZL==="a");
+  document.querySelectorAll(".pzl-seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pzl===PZL));
+  const X=pzLayout(pzStep,R,B);
+  svg.style.width="0px"; svg.style.height="0px";
+  const leg=box.querySelector(".pz-legend"); const cs=getComputedStyle(box);
+  const aw=box.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight), ah=box.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-(leg?leg.offsetHeight+6:0);
+  const narrow=matchMedia("(max-width:900px)").matches;
+  const cap=document.getElementById("present").clientHeight/760; const sc=narrow?1:Math.max(0.3,Math.min(aw/X.Ww,ah/X.Hh,cap));
+  svg.innerHTML=""; svg.setAttribute("viewBox",`0 0 ${X.Ww} ${X.Hh}`);
+  if(narrow){svg.style.width="";svg.style.height="";} else {svg.style.width=Math.round(X.Ww*sc)+"px"; svg.style.height=Math.round(X.Hh*sc)+"px";}
+  const {L,BOX,P,NUM,prior,shown}=X;
+  const defs=el("defs",{},svg); const mk=el("marker",{id:"pzArrow",viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"14",markerHeight:"14",markerUnits:"userSpaceOnUse",orient:"auto"},defs); el("path",{d:"M0,0 L10,5 L0,10 z",class:"pah"},mk);
+  let loop=0;
+  shown.forEach(id=>NB[id].deps.forEach(d=>{if(!P[d])return;const a=P[d],b=P[id];
+    if(Math.abs(a.x-b.x)<1){const bulge=30+12*(loop++%3),x1=a.x+L.NW,y1=a.y+BOX[d].h*0.62,x2=b.x+L.NW+2,y2=b.y+BOX[id].h*0.38;el("path",{d:`M${x1},${y1} C${x1+bulge},${y1} ${x2+bulge},${y2} ${x2},${y2}`,class:"pe","marker-end":"url(#pzArrow)"},svg);return;}
+    const x1=a.x+L.NW,y1=a.y+BOX[d].h/2,x2=b.x-2,y2=b.y+BOX[id].h/2,mx=(x1+x2)/2;el("path",{d:`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:"pe","marker-end":"url(#pzArrow)"},svg);}));
+  shown.forEach(id=>{const n=NB[id],p=P[id],bx=BOX[id];const g=el("g",{class:"pn "+(prior.has(id)?"prior":n.type==="input"?"input":n.out?"output":"calc"),transform:`translate(${p.x},${p.y})`},svg);
+    el("rect",{width:L.NW,height:bx.h,rx:9},g); if(n.side) el("rect",{x:0,y:0,width:6,height:bx.h,rx:3,fill:n.side==="b"?"var(--side-b)":"var(--side-d)"},g);
+    let y=L.PAD+L.LS*0.85; bx.lab.forEach(t=>{el("text",{x:L.PAD,y,class:"pl",style:`font-size:${L.LS}px`},g).textContent=t;y+=X.lh;}); y+=6-X.lh+X.vh;
+    bx.vl.forEach((t,i)=>{el("text",{x:L.PAD,y,class:"pv",style:`font-size:${L.VS}px`},g).textContent=t;if(i<bx.vl.length-1)y+=X.vh;});
+    if(bx.dt){const yy=bx.dtOwn?y+Math.round(L.VS*.7):y;el("text",{x:L.NW-L.PAD,y:yy,class:"pd "+deltaClass(R[n.r]-B[n.r],n.good),"text-anchor":"end",style:`font-size:${Math.round(L.VS*.6)}px`},g).textContent=bx.dt;if(bx.dtOwn)y=yy;}
+    if(bx.note.length){y+=6;bx.note.forEach(t=>{y+=X.nh;el("text",{x:L.PAD,y:y-X.nh*0.25,class:"pnote",style:`font-size:${L.NS}px`},g).textContent=t;});}
+    if(NUM[id]){const q=el("g",{class:"pnum",transform:`translate(${L.NW-L.PAD-11},${L.PAD+L.LS*0.45})`},g);el("circle",{r:13},q);el("text",{"text-anchor":"middle",y:5},q).textContent=NUM[id];}
+    if(n.term&&GLOSS[n.term])stitle(g,GLOSS[n.term][0]+": "+GLOSS[n.term][1]);});
+  const ids=Object.keys(NUM).sort((a,b)=>NUM[a]-NUM[b]);
+  document.getElementById("pzHow").innerHTML=ids.map(id=>`<li><span class="n">${NUM[id]}</span><span><b>${esc(NB[id].label)}</b> = ${esc(PZ_HOW[id](R))}</span></li>`).join("");
+  document.getElementById("pzHowBox").hidden=!ids.length||PZL==="b";
+}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".pzl-seg button");if(!b)return;PZL=b.dataset.pzl;try{localStorage.setItem(LS+"pzl",PZL);}catch(x){}renderPresent();});
+let pzRz; window.addEventListener("resize",()=>{clearTimeout(pzRz);pzRz=setTimeout(()=>{if(mode==="present")renderPresent();},120);});
 function renderPresent(){
   document.getElementById("pzMapbox").classList.remove("sum"); document.getElementById("pzHowBox").hidden=false;
   pzNav();
   if(pzStep===PZ_LAST){renderSummary();return;}
-  document.querySelector(".pz-legend").textContent="Read left to right · arrows show what feeds what · yellow = the settings above · white = worked out (numbered below) · dashed = from an earlier step";
+  document.querySelector(".pz-legend").textContent="Read left to right · arrows show what feeds what · yellow = the settings · white = worked out"+(PZL==="a"?" (explained at right)":" (the formula is in each box)")+" · dashed = from an earlier step";
   const st=STEPS[pzStep], R=CUR[focus], B=BAS[focus];
   document.getElementById("pzEyebrow").textContent=`Step ${pzStep+1} of ${STEPS.length} · ${focus}`;
   document.getElementById("pzTitle").textContent=st.t;
   document.getElementById("pzText").innerHTML=st.x(R);
   const box=document.getElementById("pzCtls");
   if(box.dataset.step!==String(pzStep)){box.dataset.step=pzStep;box.innerHTML="";st.ctl.forEach(k=>{const c=CTRL_BY[k];if(c)box.appendChild(ctlEl(c,"pz-"));});syncControls();}
-  const earlier=new Set(STEPS.slice(0,pzStep).flatMap(x=>x.nodes)); const prior=new Set(st.nodes.filter(id=>earlier.has(id)));
-  const shown=[...st.nodes]; const cols=[...new Set(shown.map(id=>NB[id].col))].sort();
-  const colIdx=Object.fromEntries(cols.map((c,i)=>[c,i])); const NW=310,GX=92,GY=22,PAD=16;
-  const cs=getComputedStyle(document.documentElement), fb=(cs.getPropertyValue("--f-body")||"sans-serif").trim(), fm=(cs.getPropertyValue("--f-mono")||"monospace").trim();
-  const LF=`17px ${fb}`, VF=`600 25px ${fm}`, DF=`600 15px ${fm}`;
-  // number the boxes worked out in this step (left to right, top to bottom)
-  const byCol={}; shown.forEach(id=>{const k=colIdx[NB[id].col];(byCol[k]=byCol[k]||[]).push(id);});
-  Object.values(byCol).forEach(a=>a.sort((p,q)=>POS[p].y-POS[q].y));
-  const NUM={}; let nn=0; Object.keys(byCol).sort((a,b)=>a-b).forEach(k=>byCol[k].forEach(id=>{const n=NB[id];if(n.type!=="input"&&!prior.has(id)&&PZ_HOW[id])NUM[id]=++nn;}));
-  // measure each box: wrapped label + wrapped value (+ change)
-  const BOX={};
-  shown.forEach(id=>{const n=NB[id];const val=n.r?F[n.fmt](R[n.r]):n.v(R,focus);const dt=n.r?deltaText(R[n.r]-B[n.r],n.fmt):"";
-    const lab=pzWrap(n.label,LF,NW-PAD*2-(NUM[id]?30:0)); const vl=pzWrap(val,VF,NW-PAD*2);
-    pzMeasure.font=VF; const lastW=pzMeasure.measureText(vl[vl.length-1]).width; pzMeasure.font=DF; const dW=dt?pzMeasure.measureText(dt).width:0;
-    const dtOwn=!!dt&&lastW+dW+18>NW-PAD*2;
-    const h=14+lab.length*21+8+vl.length*30+(dtOwn?20:0)+12; BOX[id]={val,dt,lab,vl,dtOwn,h};});
-  const colH=k=>byCol[k].reduce((a,id)=>a+BOX[id].h,0)+(byCol[k].length-1)*GY;
-  const Hh=Math.max(...Object.keys(byCol).map(colH))+12, Ww=cols.length*NW+(cols.length-1)*GX+84;
-  const P={}; Object.keys(byCol).forEach(k=>{let y=(Hh-colH(k))/2;byCol[k].forEach(id=>{P[id]={x:6+k*(NW+GX),y};y+=BOX[id].h+GY;});});
-  const svg=document.getElementById("pzsvg");svg.innerHTML="";svg.setAttribute("viewBox",`0 0 ${Ww} ${Hh}`);
-  const defs=el("defs",{},svg); const mk=el("marker",{id:"pzArrow",viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"9",markerHeight:"9",markerUnits:"userSpaceOnUse",orient:"auto"},defs);
-  mk.setAttribute("markerWidth","13");mk.setAttribute("markerHeight","13"); el("path",{d:"M0,0 L10,5 L0,10 z",class:"pah"},mk);
-  let loop=0;
-  shown.forEach(id=>NB[id].deps.forEach(d=>{if(!P[d])return;const a=P[d],b=P[id];
-    if(Math.abs(a.x-b.x)<1){ // same column: a bracket on the right, arrow into the right edge
-      const bulge=34+14*(loop++%3), x1=a.x+NW, y1=a.y+BOX[d].h*0.62, x2=b.x+NW+2, y2=b.y+BOX[id].h*0.38;
-      el("path",{d:`M${x1},${y1} C${x1+bulge},${y1} ${x2+bulge},${y2} ${x2},${y2}`,class:"pe","marker-end":"url(#pzArrow)"},svg); return;}
-    const x1=a.x+NW,y1=a.y+BOX[d].h/2,x2=b.x-2,y2=b.y+BOX[id].h/2,mx=(x1+x2)/2;el("path",{d:`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:"pe","marker-end":"url(#pzArrow)"},svg);}));
-  shown.forEach(id=>{const n=NB[id],p=P[id],bx=BOX[id];const g=el("g",{class:"pn "+(prior.has(id)?"prior":n.type==="input"?"input":n.out?"output":"calc"),transform:`translate(${p.x},${p.y})`},svg);
-    el("rect",{width:NW,height:bx.h,rx:8},g); if(n.side) el("rect",{x:0,y:0,width:6,height:bx.h,rx:3,fill:n.side==="b"?"var(--side-b)":"var(--side-d)"},g);
-    let y=14+16; bx.lab.forEach(t=>{el("text",{x:PAD,y,class:"pl"},g).textContent=t;y+=21;}); y+=8+22-21;
-    bx.vl.forEach((t,i)=>{el("text",{x:PAD,y,class:"pv"},g).textContent=t;if(i<bx.vl.length-1)y+=30;});
-    if(bx.dt){const yy=bx.dtOwn?y+22:y;el("text",{x:NW-PAD,y:yy,class:"pd "+deltaClass(R[n.r]-B[n.r],n.good),"text-anchor":"end"},g).textContent=bx.dt;}
-    if(NUM[id]){const q=el("g",{class:"pnum",transform:`translate(${NW-PAD-10},${14+9})`},g);el("circle",{r:13},q);el("text",{"text-anchor":"middle",y:5},q).textContent=NUM[id];}
-    if(n.term&&GLOSS[n.term])stitle(g,GLOSS[n.term][0]+": "+GLOSS[n.term][1]);});
-  // plain-language explanation of each numbered box
-  const ids=Object.keys(NUM).sort((a,b)=>NUM[a]-NUM[b]);
-  document.getElementById("pzHow").innerHTML=ids.map(id=>{const n=NB[id];const from=n.deps.filter(d=>P[d]).map(d=>NB[d].label);
-    return `<li><span class="n">${NUM[id]}</span><span><b>${esc(n.label)}</b> = ${esc(PZ_HOW[id](R))}</span></li>`;}).join("");
-  document.getElementById("pzHowBox").hidden=!ids.length;
+  pzDrawMap(R,B);
   document.getElementById("pzRes").innerHTML=st.res.map(k=>{const [l,f,g]=RES_L[k];return `<div><span class="eyebrow">${l} · ${focus}</span><span class="v">${F[f](R[k])}</span>${chip(R[k]-B[k],f==="mo"?"usd":f,g)}</div>`;}).join("");
 }
 /* --- Build it mode --- */
