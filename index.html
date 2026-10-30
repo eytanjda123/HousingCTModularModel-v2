@@ -316,6 +316,10 @@ table.left td,table.left th{text-align:left}
 </style></head><body>
 
 <style>
+#pzCtls .ctl{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:10px 12px}
+#pzCtls .ctl-l{font-size:1rem}
+#pzCtls .numin{width:110px;font-size:1rem}
+#pzCtls select{font-size:1rem}
 #inputsView{display:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 table.ivt .ivgo{display:block;margin-top:3px}
@@ -1198,8 +1202,8 @@ const CTRL=[
  {k:"ownerAMI",g:"scn",label:"Owner household income target",type:"range",step:0.01,fmt:"pct",conf:"ch",node:"i_hh",...SH("ownerAMI"),why:"80% AMI, the consensus in the room at External Review 1."},
  {k:"hhSize",g:"scn",label:"Owner household size",type:"range",min:1,max:8,floor:1,step:1,fmt:"num",conf:"ch",node:"i_hh",...SH("hhSize"),why:"A 4-person household, HUD's reference size."},
  {k:"rentAMI",g:"scn",label:"Rental unit rent target",type:"range",step:0.01,fmt:"pct",conf:"ch",node:"i_rentT",...SH("rentAMI"),why:"Team choice: rent the second unit at 60% AMI. Set it to 0% for market rent."},
- {k:"rentShare",g:"scn",label:()=>{let R=null;try{R=computeCity(S,focus);}catch(e){}return `Rent + utilities as % of income, ${pct(S.shared.rentAMI)} AMI ${S.shared.rentBR} household`+(R&&R.tenantInc>0?` (${usdK(R.tenantInc)}/yr)`:"");},type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_rentT",...SH("rentShare"),why:"Gross rent, including the tenant's utilities, as a share of the income of a household at the rent target. 30% is HUD's affordability standard and the basis of LIHTC-style rent limits; lower it for a deeper discount. Set rent by this %, or type a dollar figure in the box below; the two stay linked."},
- {k:"rentDollar",virtual:true,g:"scn",label:()=>{let R=null;try{R=computeCity(S,focus);}catch(e){}if(!R)return "Rent charged ($/mo)";return `Rent charged ($/mo, excl. utilities) = ${pct(R.rentPctInc,1)} of income`+(R.rentBinding==="Market rent"?" · capped at market":"");},type:"range",step:5,fmt:"usd",conf:"ch",node:"i_rentT",get:(St,c)=>compute(St,c).rent,set:(St,c,v)=>{const R=compute(St,c),ri2=BR.indexOf(St.shared.rentBR);if(R.tenantInc>0)St.shared.rentShare=Math.max(0,(v+St.shared.ua[ri2])*12/R.tenantInc);},why:"The rent the tenant pays, after the utility allowance. Typing a dollar figure here sets the % of income above to match (for the focus city; other cities follow the same %). If market rent is lower, the market rent is charged instead."},
+ {k:"rentShare",g:"scn",bounds:()=>[0.15,0.45],label:()=>{let R=null;try{R=computeCity(S,focus);}catch(e){}return `Rent + utilities as % of income, ${pct(S.shared.rentAMI)} AMI ${S.shared.rentBR} household`+(R&&R.tenantInc>0?` (${usdK(R.tenantInc)}/yr)`:"");},type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_rentT",...SH("rentShare"),why:"Gross rent, including the tenant's utilities, as a share of the income of a household at the rent target. 30% is HUD's affordability standard and the basis of LIHTC-style rent limits; lower it for a deeper discount. Set rent by this %, or type a dollar figure in the box below; the two stay linked."},
+ {k:"rentDollar",virtual:true,g:"scn",bounds:city=>{const at=sh=>{const T=clone(S);T.shared.rentShare=sh;return computeCity(T,city).rent;};return [Math.max(0,at(0.15)),at(0.45)];},label:()=>{let R=null;try{R=computeCity(S,focus);}catch(e){}if(!R)return "Rent charged ($/mo)";return `Rent charged ($/mo, excl. utilities) = ${pct(R.rentPctInc,1)} of income`+(R.rentBinding==="Market rent"?" · capped at market":"");},type:"range",step:5,fmt:"usd",conf:"ch",node:"i_rentT",get:(St,c)=>compute(St,c).rent,set:(St,c,v)=>{const R=compute(St,c),ri2=BR.indexOf(St.shared.rentBR);if(R.tenantInc>0)St.shared.rentShare=Math.max(0,(v+St.shared.ua[ri2])*12/R.tenantInc);},why:"The rent the tenant pays, after the utility allowance. Typing a dollar figure here sets the % of income above to match (for the focus city; other cities follow the same %). If market rent is lower, the market rent is charged instead."},
  {k:"capMkt",g:"scn",label:"Cap the AMI rent at market rent",type:"check",conf:"ch",node:"i_rentT",...SH("capMkt"),why:"An owner can't charge more than the market will pay. The workbook always caps."},
  {k:"ami50",g:"city",label:"HUD 50% income limit, 4-person",type:"range",step:50,fmt:"usd",conf:"src",node:"i_ami",...CT("ami50"),why:"HUD FY2026 Section 8 income limits. The model uses twice this as 100% AMI."},
  {k:"mkt",g:"city",label:()=>"Market asking rent, "+S.shared.rentBR,type:"range",step:5,fmt:"usd",conf:"src",node:"i_mkt",...CT("mkt",ri),why:"New Haven: Zillow, Sept 2026. Hartford and Waterbury: Redfin, Aug 2026."},
@@ -1210,7 +1214,7 @@ const CTRL=[
  {k:"assess",g:"city",label:"Assessment ratio, 1–3 unit homes",type:"range",step:0.001,fmt:"pct1",conf:"src",node:"i_mill",...CT("assess"),why:"Share of market value that is taxed. 70% by state law, but Hartford uses 36.8% for 1–3 unit residential, so its effective tax rate (about 2.57%) is lower than New Haven's (2.80%) despite the higher mill rate. Hartford's lower ratio is a question for the law team."},
  {k:"assess4",g:"city",label:"Assessment ratio, 4+ unit buildings",type:"range",step:0.001,fmt:"pct1",conf:"src",node:"i_mill",...CT("assess4"),why:"Used only for 4 or more units. Hartford treats 4+ unit buildings differently from 1–3 unit homes."},
  {k:"land",g:"city",label:"Land acquisition and closing ($/building)",type:"range",step:100,fmt:"usd",conf:"ph",node:"i_land",...CT("land"),why:"The New Haven Land Bank conveys city lots for $1; closing is a placeholder. Applied to every city."},
- {k:"rate",g:"fin",label:"Mortgage rate",type:"range",step:0.00005,fmt:"pct3",conf:"src",node:"i_mort",...SH("rate"),why:"CHFA government-insured rate 6.75% less the 0.25% Targeted Area discount (Oct 2026). The market average is 7.32%."},
+ {k:"rate",g:"fin",bounds:()=>[0.04,0.09],label:"Mortgage rate",type:"range",step:0.00005,fmt:"pct3",conf:"src",node:"i_mort",...SH("rate"),why:"CHFA government-insured rate 6.75% less the 0.25% Targeted Area discount (Oct 2026). The market average is 7.32%."},
  {k:"term",g:"fin",label:"Mortgage term (years)",type:"range",step:5,fmt:"num",conf:"ch",node:"i_mort",...SH("term"),why:"Standard 30-year mortgage."},
  {k:"mip",g:"fin",label:"FHA mortgage insurance (annual)",type:"range",step:0.0001,fmt:"pct2",conf:"src",node:"i_mort",...SH("mip"),why:"FHA's 0.55% rate at 3.5% down."},
  {k:"dp",g:"fin",label:"Down payment",type:"range",step:0.005,fmt:"pct1",conf:"src",node:"i_dp",...SH("dp"),why:"FHA minimum for a 2–4 unit owner-occupied purchase."},
@@ -1355,6 +1359,7 @@ const EXT={};
 function boundsOf(c,city){
   const r=rg(c,city); const v=getV(c,S,city), d=defV(c,city);
   let lo=c.min!==undefined?c.min:(r?r.lo:v), hi=c.max!==undefined?c.max:(r?r.hi:v);
+  if(c.bounds){try{const bb=c.bounds(city);lo=Math.min(lo,bb[0]);hi=Math.max(hi,bb[1]);}catch(e){}}
   if(c.min===undefined&&r){ if(hi-lo<1e-12){const pad=Math.max(Math.abs(lo)*0.1,c.step*5);lo=lo-pad;hi=hi+pad;} }
   if(typeof v==="number"){lo=Math.min(lo,v);hi=Math.max(hi,v);} if(typeof d==="number"){lo=Math.min(lo,d);hi=Math.max(hi,d);}
   const e=EXT[c.k]; if(e){if(e.lo!==undefined)lo=Math.min(lo,e.lo);if(e.hi!==undefined)hi=Math.max(hi,e.hi);}
@@ -1674,9 +1679,9 @@ function buildControls(){
     box.appendChild(d);
   });
 }
-function ctlEl(c){
-  const w=document.createElement("div");w.className="ctl"+(c.ny?" ny":"");w.dataset.k=c.k;
-  const id="ctl-"+c.k;
+function ctlEl(c,pre){
+  const w=document.createElement("div");w.className="ctl"+(c.ny?" ny":"");w.dataset.k=c.k;w.dataset.pre=pre||"ctl-";
+  const id=(pre||"ctl-")+c.k;
   let inp="";
   if(c.type==="range") inp=`<div class="rwrap"><input type="range" id="${id}" aria-label="${esc(lbl(c))}"><div class="band" aria-hidden="true"><i></i><b></b></div></div>`;
   if(c.type==="select") inp=`<select id="${id}">${c.opts.map(o=>`<option>${o}</option>`).join("")}</select>`;
@@ -1715,7 +1720,7 @@ document.getElementById("closeAll").addEventListener("click",()=>setAllOpen(fals
 function syncSubs(){document.querySelectorAll("details.sub[data-tog]").forEach(sd=>{const on=!!getV(CTRL_BY[sd.dataset.tog],S,focus);const t=sd.querySelector(".subtog");t.textContent=on?"On":"Off";t.className="tag subtog "+(on?"src":"ny");});}
 function syncControls(){
   syncSubs();
-  document.querySelectorAll("#controls .ctl").forEach(w=>{const c=CTRL_BY[w.dataset.k];const id="ctl-"+c.k;const input=w.querySelector("#"+CSS.escape(id));
+  document.querySelectorAll("#controls .ctl, #pzCtls .ctl").forEach(w=>{const c=CTRL_BY[w.dataset.k];const id=(w.dataset.pre||"ctl-")+c.k;const input=w.querySelector("#"+CSS.escape(id));
     const v=getV(c,S,focus), d=defV(c,focus), ov=isOv(S,c,focus);
     w.querySelector(".ctl-l").innerHTML=termWrap(lbl(c));
     const changed=JSON.stringify(v)!==JSON.stringify(d)||(c.ny&&c.on(S,focus)!==c.on(DEFAULTS,focus));
@@ -2013,7 +2018,7 @@ function renderNY(){
 const STEPS=[
  {t:"Start with the household",nodes:["i_ami","i_hh","c_inc"],ctl:["ownerAMI","hhSize"],res:["income"],
   x:R=>`The base case is an owner at <b>${pct(S.shared.ownerAMI)}</b> of area median income, the consensus in the room at the review, with a household of <b>${S.shared.hhSize}</b>. In ${focus} that household earns <b>${usd(R.income)}</b> a year.`},
- {t:"The second unit pays part of the cost",nodes:["i_rentT","i_mkt","i_ua","c_rent","c_collect","c_lrent"],ctl:["rentAMI","rentDollar","mkt"],res:["rent","collected"],
+ {t:"The second unit pays part of the cost",nodes:["i_rentT","i_mkt","i_ua","c_rent","c_collect","c_lrent"],ctl:["rentAMI","rentShare","rentDollar","mkt"],res:["rent","collected"],
   x:R=>`The owner rents the other unit at the lower of the ${pct(S.shared.rentAMI)} AMI limit (<b>${usd(R.rentNet)}</b>, ${pct(S.shared.rentShare)} of income less utilities) and market rent (<b>${usd(R.market)}</b>), which is <b>${usd(R.rent)}/mo</b>. A lender counts 75% of it.`},
  {t:"Two tests decide what the buyer can pay",nodes:["c_inc","c_lrent","c_collect","i_mort","i_mill","c_opex","c_k","c_testA","c_testB","o_cap"],ctl:["rate","mill"],res:["testA","testB","capacity"],
   x:R=>`The lender's test comes to <b>${usdK(R.testA)}</b> and the owner's own budget to <b>${usdK(R.testB)}</b>. The lower, <b>${usdK(R.capacity)}</b>, is what the buyer can pay with their own mortgage and down payment.`},
@@ -2083,10 +2088,7 @@ function renderPresent(){
   document.getElementById("pzTitle").textContent=st.t;
   document.getElementById("pzText").innerHTML=st.x(R);
   const box=document.getElementById("pzCtls");
-  if(box.dataset.step!==String(pzStep)){box.dataset.step=pzStep;box.innerHTML=st.ctl.map(k=>{const c=CTRL_BY[k];return `<div class="pzc" data-k="${k}"><div class="pzc-top"><label for="pz-${k}">${esc(lbl(c))}</label><span></span></div>${c.type==="range"?`<input type="range" id="pz-${k}">`:c.type==="check"?`<input type="checkbox" id="pz-${k}">`:`<select id="pz-${k}">${c.opts.map(o=>`<option>${o}</option>`).join("")}</select>`}</div>`;}).join("");
-    box.querySelectorAll(".pzc").forEach(w=>{const c=CTRL_BY[w.dataset.k];const i=w.querySelector("input,select");i.addEventListener(c.type==="check"?"change":"input",()=>{setV(c,S,focus,c.type==="range"?parseFloat(i.value):c.type==="check"?i.checked:i.value);update();});if(c.type==="range")i.addEventListener("change",()=>{if(stretch(c,focus,parseFloat(i.value)))update();});});}
-  box.querySelectorAll(".pzc").forEach(w=>{const c=CTRL_BY[w.dataset.k];const i=w.querySelector("input,select");const v=getV(c,S,focus);w.querySelector(".pzc-top span").textContent=fmtCtl(c,v);
-    if(c.type==="range"){const [lo,hi]=boundsOf(c,focus);i.min=lo;i.max=hi;i.step=c.step;if(document.activeElement!==i)i.value=v;}else if(c.type==="check")i.checked=!!v;else i.value=v;});
+  if(box.dataset.step!==String(pzStep)){box.dataset.step=pzStep;box.innerHTML="";st.ctl.forEach(k=>{const c=CTRL_BY[k];if(c)box.appendChild(ctlEl(c,"pz-"));});syncControls();}
   const earlier=new Set(STEPS.slice(0,pzStep).flatMap(x=>x.nodes)); const prior=new Set(st.nodes.filter(id=>earlier.has(id)));
   const shown=[...st.nodes]; const cols=[...new Set(shown.map(id=>NB[id].col))].sort();
   const colIdx=Object.fromEntries(cols.map((c,i)=>[c,i])); const NW=290,NHh=74,GX=80,GY=20;
