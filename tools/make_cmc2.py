@@ -19,7 +19,7 @@ T_('Read Me','B17','1. Rent: the rental unit charges the lower of the AMI rent (
 T_('Read Me','B18','2. Buyer capacity: the lower of Test A (lender: 40% of own income + 75% of rent) and Test B (owner: 30% of own income + rent collected), after tax, insurance, utilities and reserves.')
 T_('Read Me','B19','3. Price: the lower of buyer capacity and the appraised value (the basis set in the explorer: existing-home median, size-adjusted new-build value, or the DOH precedent). Time To Own and the DOH homebuyer subsidy fill the buyer gap.')
 T_('Read Me','B20','4. Cost: modular factory + field cost per gross sq ft (falling with order volume), transport, site work, contingency, itemized soft costs, the construction loan, carry and land, plus the developer fee, give the total development cost (TDC).')
-T_('Read Me','B21',"5. Subsidy needed = TDC - what the buyer pays. The developer gap (TDC - sale proceeds) is filled in order by HDF, AHP, HTCC, NMTC (if on) and DOH. 'Per unit' (the deck's 'per door') divides by the units in the building.")
+T_('Read Me','B21',"5. Subsidy needed = TDC - what the buyer pays. The developer gap (TDC - gross sales price) is filled in order by HDF, AHP (if counted), HTCC, DOH rental (if on), NMTC (if on) and DOH; buyer-side money only fills the buyer's sales gap. 'Per unit' (the deck's 'per door') divides by the units in the building.")
 T_('Read Me','B24','Modular costs (faculty placeholders for Reframe at the set order volume), land closing, warehouse and add-on figures, and every funding amount. Mill rates and assessment ratios are confirmed with each city.')
 T_('Read Me','B25','The funding stack uses caps and precedents, not awards. Whether DOH, HDF, AHP and HTCC can fund the same home is for the law team to confirm.')
 T_('Read Me','B26','For the fully live model with every formula, use Export model in the explorer. Changes from the explorer defaults are listed at the bottom of this tab.')
@@ -44,7 +44,7 @@ T_(SI,'B37','PREFAB MODULAR COST BY BUILDING SIZE (PLACEHOLDER, at the order vol
 for j,n in enumerate([2,3,4]):
     col="CDE"[j]; N(SI,f'{col}39',f'U({n},0).facPSF'); N(SI,f'{col}40',f'U({n},0).fieldPSF'); N(SI,f'{col}41',f'U({n},0).trans')
 S_(SI,'B43','"Source: F26 Housing CT Model Workshop v2.2 (course faculty), Volume Curve tab: "+s.method+" placeholders at a "+s.volume+"-building order. Replace with real manufacturer quotes."')
-for r,e in [(46,'s.tto'),(47,'s.otherAssist'),(48,'s.dohCap'),(49,'s.hdf'),(50,'s.ahp'),(51,'s.htcc'),(52,'s.htccHomes')]: N(SI,f'C{r}',e)
+for r,e in [(46,'s.tto'),(47,'s.otherAssist'),(48,'s.dohCap'),(49,'s.hdf'),(50,'(s.inc.ahp?s.ahp:0)'),(51,'s.htcc'),(52,'s.htccHomes')]: N(SI,f'C{r}',e)
 T_(SI,'B48','DOH Developer Subsidy, cap per home')
 # ---------- City tabs
 for city in CITIES:
@@ -89,14 +89,14 @@ for city in CITIES:
     lab('B95','Developer fee'); n('C95','R.feeC')
     lab('B96','Total development cost (TDC, incl. developer fee)'); n('C96','R.tdc')
     lab('B99','Subsidy needed per building (TDC minus what the buyer pays)'); n('C99','R.subNeed'); n('C100','R.subNeed/s.units'); n('C101','R.subNeed/R.tdc')
-    lab('B102','Developer gap (TDC minus sale proceeds)'); n('C102','R.devGap')
+    lab('B102','Developer gap (TDC minus gross sales price)'); n('C102','R.devGap')
     lab('B103',"Buyer's price as % of the existing-building median"); n('C103','Math.min(R.capacity,R.fmv)/c.med[R.bucket]')
     n('C106','R.pi'); n('C107','R.tax'); n('C108','R.insM'); n('C109','R.commonM+R.energyM'); lab('B110','Plus maintenance and reserves (less add-on savings)'); n('C110','R.maintM-R.featSaveMo'); n('C112','R.collected')
     lab('B118','Hard cost (building, add-ons, site work)'); lab('B121','Construction loan, carry and land'); lab('B122','Developer fee')
     lab('B125','Subsidy needed (buyer assistance + developer-side programs + remaining gap)')
     lab('B131','Total development cost'); n('C131','R.tdc')
     n('C132','R.mortgage+R.down')
-    lab('B133','Buyer assistance (Time To Own + DOH homebuyer subsidy)'); n('C133','R.tto+R.hb')
+    lab('B133','Buyer assistance (Time To Own + DOH homebuyer subsidy)'); n('C133','R.ttoAll+R.hbAll')
     lab('B134','HDF / C4C grant'); n('C134','R.sHdf')
     lab('B135','FHLBank Boston AHP'); n('C135','R.sAhp')
     lab('B136','HTCC share'); n('C136','R.sHtcc')
@@ -118,12 +118,12 @@ for city in CITIES:
     lab('B160','Stick-built TDC'); lab('B169','Modular = the construction method set in the explorer. The appraisal stays at the value set for the base building. DOH excludes 3+ unit structures.')
     # section 10
     for t,(c_,r_) in {'Developer fee':('D',172),'Appraised value':('E',172),'Total development cost':('L',172),'Buyer assistance (TTO + DOH homebuyer)':('O',172)}.items(): lab(f'{c_}{r_}',t)
-    lab('B176','Developer fee deferred (0%)'); lab('B177','Developer fee 5%'); lab('B185','Hard cost -10% and fee 5%')
+    lab('B176','Developer fee deferred (0%)'); lab('B177','Developer fee 5%'); lab('B185','Hard cost -10% and fee 5%'); lab('B183','AHP award counted (needs a member bank)')
     for i in range(13):
         r=173+i
         for col,e in [('C','SCR(%d).hardMult'),('D','SCR(%d).T.shared.fee'),('E','SCR(%d).R.fmv'),('F','SCR(%d).T.shared.ownerAMI'),('G','SCR(%d).T.shared.rate'),
-                      ('H','SCR(%d).T.shared.dohCap'),('I','SCR(%d).T.shared.hdf'),('J','SCR(%d).T.shared.ahp'),('K','SCR(%d).T.shared.htcc/SCR(%d).T.shared.htccHomes'),
-                      ('L','SCR(%d).R.tdc'),('M','SCR(%d).R.capacity'),('N','Math.min(SCR(%d).R.capacity,SCR(%d).R.fmv)'),('O','SCR(%d).R.tto+SCR(%d).R.hb'),('P','SCR(%d).R.remain')]:
+                      ('H','SCR(%d).T.shared.dohCap'),('I','SCR(%d).T.shared.hdf'),('J','(SCR(%d).T.shared.inc.ahp?SCR(%d).T.shared.ahp:0)'),('K','SCR(%d).T.shared.htcc/SCR(%d).T.shared.htccHomes'),
+                      ('L','SCR(%d).R.tdc'),('M','SCR(%d).R.capacity'),('N','Math.min(SCR(%d).R.capacity,SCR(%d).R.fmv)'),('O','SCR(%d).R.ttoAll+SCR(%d).R.hbAll'),('P','SCR(%d).R.remain')]:
             n(f'{col}{r}',e.replace('%d',str(i)))
     lab('B186','Each row reruns the explorer model with one change from the scenario as set. A remaining gap of $0 means the stack covers it under that assumption.')
 # ---------- Compare labels
