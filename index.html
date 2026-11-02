@@ -202,9 +202,9 @@ details.grp[open]>summary::after{content:"–"}
 .impnote{font-size:.8rem;color:var(--ink-2);max-width:84ch;margin:-2px 0 10px}
 .flowscroll{overflow-x:auto;border:1px solid var(--rule-2);border-radius:8px;background:var(--paper)}
 #flow{display:block;min-width:820px;width:100%;height:auto}
-#flow .edge{fill:none;stroke:var(--rule);stroke-width:1.3;transition:opacity .15s}
-#flow .edge.flowing{stroke:var(--flow)}
-#flow.impact .edge:not(.flowing){opacity:.35}
+#flow .edge{fill:none;stroke:var(--ink-3);stroke-opacity:.4;stroke-width:1.2;transition:opacity .15s}
+#flow .edge.flowing{stroke:var(--flow);stroke-opacity:.85}
+#flow.impact .edge:not(.flowing){opacity:.5}
 #flow .node rect.box{fill:var(--sheet);stroke:var(--rule);stroke-width:1}
 #flow .node.input rect.box{fill:var(--input-bg);stroke:transparent}
 #flow .node.input.changed rect.box{stroke:var(--input-fg);stroke-width:1.6}
@@ -444,7 +444,11 @@ table.ivt select.ivv{font:inherit;max-width:190px;background:var(--input-bg);col
 .bp-fold{margin-top:6px;border-top:1px solid var(--rule-2);padding-top:8px}
 .bp-fold>summary{cursor:pointer;font-weight:600}
 .bp-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:18px;margin-top:10px;align-items:start}
-.rk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px}.rk-big{font-family:var(--f-mono);font-size:1.25rem;font-weight:600;margin:4px 0}.rk-t{width:100%;min-width:0}.rk-grid>div{min-width:0;overflow-x:auto}#buyCtls .ctl{margin-left:0;margin-right:0}.bp-grid>*{min-width:0}.rk-c{width:30%}.rk-bar{display:inline-block;height:9px;border-radius:2px;vertical-align:middle}.rk-bar.neg{background:var(--bad)}.rk-bar.pos{background:var(--good)}
+.rk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 24px}.rk-big{font-family:var(--f-mono);font-size:1.25rem;font-weight:600;margin:4px 0}.rk-t{width:100%;min-width:0}
+#flow .rollbtn{cursor:pointer}#flow .rollbtn .rb{fill:var(--sheet);stroke:var(--ink-3);stroke-width:1.2}#flow .rollbtn .rt{font-family:var(--f-mono);font-size:10px;font-weight:700;fill:var(--ink-2);pointer-events:none}
+#flow .rollbtn:hover .rb,#flow .rollbtn:focus-visible .rb{stroke:var(--accent);stroke-width:2}#flow .rollbtn.on .rb{fill:var(--accent);stroke:var(--accent)}#flow .rollbtn.on .rt{fill:var(--sheet)}
+#flow .node.half .val{font-size:11px!important}#flow .node.half .imp,#flow .node.half .dlt{font-size:9.5px}
+#flow .node.rolled rect.box{stroke-dasharray:5 3;stroke-width:1.8}.rk-grid>div{min-width:0;overflow-x:auto}#buyCtls .ctl{margin-left:0;margin-right:0}.bp-grid>*{min-width:0}.rk-c{width:30%}.rk-bar{display:inline-block;height:9px;border-radius:2px;vertical-align:middle}.rk-bar.neg{background:var(--bad)}.rk-bar.pos{background:var(--good)}
 :root{--in-b:#EDE4FA;--in-d:#DDF2EA}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--in-b:#3B2F57;--in-d:#1E3F36}}
 :root[data-theme="dark"]{--in-b:#3B2F57;--in-d:#1E3F36}
@@ -662,7 +666,7 @@ body.mode-build main>section.panel:not(.bshow), body.mode-build main>section.two
       <div class="foldctl" role="group" aria-label="Fold parts of the map"><span class="eyebrow">Fold the map</span>
         <button class="btn sm fold-b" id="foldBuyer" aria-pressed="false">Fold the buyer side</button>
         <button class="btn sm fold-d" id="foldDev" aria-pressed="false">Fold the cost build</button>
-        <span class="note">Folding shrinks a side to the one number the rest of the model uses.</span></div>
+        <span class="note">Folding shrinks a side to the one number the rest of the model uses. The − / + on a calculation box rolls up the boxes that feed only that box.</span></div>
       <div class="impctl">
         <label for="impT">Size by impact on</label>
         <select id="impT"><option value="remain">Remaining developer gap</option><option value="devGap">Developer gap</option><option value="buyerRemain">Remaining buyer gap</option><option value="salesGap">Sales gap</option><option value="net">Owner's net monthly cost</option><option value="tdc">Total development cost</option><option value="off">Off (plain map)</option></select>
@@ -1808,8 +1812,11 @@ const NB=Object.fromEntries(N.map(n=>[n.id,n]));
 const FOLD_BUY=new Set(["i_ami","i_hh","i_rentT","i_mkt","i_ua","i_vac","i_tests","i_mort","i_dp","i_opex","i_mill","n_abate","i_bsub","c_inc","c_rent","c_collect","c_lrent","c_opex","c_k","c_testA","c_testB","o_cap","o_afford","o_sgap","o_net"]);
 const FOLD_DEV=new Set(["i_method","i_site","i_hx","i_feat","i_wh","i_dly","i_lev","i_softs","n_waiver","i_loan","i_land","i_fee","c_gsf","c_bldg","c_constr","c_soft","c_int"]);
 let FOLD={buyer:false,dev:false};try{Object.assign(FOLD,JSON.parse(localStorage.getItem("pge2-fold")||"{}"));}catch(e){}
-function nVis(id){if(id==="x_buyer")return FOLD.buyer;if(FOLD.buyer&&FOLD_BUY.has(id))return false;if(FOLD.dev&&FOLD_DEV.has(id))return false;return true;}
-function vDeps(n){const o=[];n.deps.forEach(dd=>{let t=dd;if(!nVis(dd)){t=(FOLD.buyer&&FOLD_BUY.has(dd))?"x_buyer":null;}if(t&&t!==n.id&&!o.includes(t))o.push(t);});if(n.id==="o_proc"&&FOLD.buyer&&!o.includes("x_buyer"))o.push("x_buyer");return o;}
+let ROLL=new Set(), HIDROLL=new Set();
+function nVis(id){if(id==="x_buyer")return FOLD.buyer;if(HIDROLL.has(id))return false;if(FOLD.buyer&&FOLD_BUY.has(id))return false;if(FOLD.dev&&FOLD_DEV.has(id))return false;return true;}
+function vDeps(n){const o=[];n.deps.forEach(dd=>{let t=dd;if(!nVis(dd)){t=(FOLD.buyer&&FOLD_BUY.has(dd))?"x_buyer":null;}if(t&&t!==n.id&&!o.includes(t))o.push(t);});
+  // a rolled-up box takes over the lines that came into the boxes it hides (from inputs that also feed other boxes)
+  if(ROLL.has(n.id)&&EX[n.id])EX[n.id].forEach(x=>NB[x].deps.forEach(dd=>{if(EX[n.id].has(dd)||dd===n.id)return;let t=dd;if(!nVis(dd)){t=(FOLD.buyer&&FOLD_BUY.has(dd))?"x_buyer":null;}if(t&&t!==n.id&&!o.includes(t))o.push(t);}));if(n.id==="o_proc"&&FOLD.buyer&&!o.includes("x_buyer"))o.push("x_buyer");return o;}
 function foldSet(set){if(FOLD.buyer&&[...set].some(id=>FOLD_BUY.has(id)))set.add("x_buyer");return set;}
 N.forEach(n=>{n.deps=n.deps||[];n.kids=[];});
 N.forEach(n=>n.deps.forEach(d=>NB[d].kids.push(n.id)));
@@ -1819,13 +1826,33 @@ const CONF_LABEL={src:"Sourced",q:"Quote",lb:"Land bank actual",doh:"DOH example
 const CONF_VAR={src:"--tag-src",q:"--tag-q",lb:"--tag-lb",doh:"--tag-doh",ph:"--tag-ph",ch:"--tag-ch",ny:"--tag-ny"};
 function reach(id,dir){const out=new Set([id]);const q=[id];while(q.length){const x=q.shift();const nx=dir==="down"?NB[x].kids:NB[x].deps;nx.forEach(y=>{if(!out.has(y)){out.add(y);q.push(y);}});}return out;}
 const DOWN={},UP={}; N.forEach(n=>{DOWN[n.id]=reach(n.id,"down");UP[n.id]=reach(n.id,"up");});
+/* Roll-ups: the boxes where everything to the left feeds only that box can be rolled up to a single box.
+   EX[id] = the boxes that feed only this one (directly or through other such boxes); anything that also feeds another box stays. */
+const ROLLABLE=["o_tdc","c_constr","c_int","c_soft","o_cap","o_afford","c_rent","c_opex"];
+const EX={};
+ROLLABLE.forEach(r=>{const S=new Set([...UP[r]].filter(x=>x!==r&&x!=="x_buyer"));let ch=true;
+  while(ch){ch=false;[...S].forEach(x=>{if(NB[x].kids.some(k=>k!=="x_buyer"&&k!==r&&!S.has(k))){S.delete(x);ch=true;}});}
+  EX[r]=S;});
+function calcRoll(){HIDROLL=new Set();ROLL.forEach(r=>EX[r].forEach(x=>HIDROLL.add(x)));}
+try{JSON.parse(localStorage.getItem("pge2-roll")||"[]").forEach(r=>{if(ROLLABLE.includes(r))ROLL.add(r);});}catch(e){}
+calcRoll();
+const SHORT={i_mkt:"Asking rent",i_ua:"Utilities",i_vac:"Vacancy",i_dp:"Down payment",i_feat:"Add-ons",i_wh:"Warehouse",i_dly:"Delays",i_lev:"Cost levers",i_land:"Land",i_fee:"Developer fee"};
+N.forEach(n=>{if(SHORT[n.id])n.short=SHORT[n.id];});
+// small input boxes that sit side by side to keep the map short (only while both are showing)
+const PAIRS=[["i_mkt","i_ua"],["i_vac","i_dp"],["i_feat","i_wh"],["i_dly","i_lev"],["i_land","i_fee"]], PAIR_OF={}; PAIRS.forEach(([a,b])=>{PAIR_OF[a]=b;});
+function setRoll(id,v){if(v)ROLL.add(id);else ROLL.delete(id);calcRoll();try{localStorage.setItem("pge2-roll",JSON.stringify([...ROLL]));}catch(e){}
+  setLock(null);if(!selNode||!nVis(selNode))selNode=ROLL.has(id)&&EX[id].has(selNode)?id:"o_remain";buildFlow();update(true);}
 
-const COLX=[6,262,486,710,934], COLW=[230,200,200,200,214], NH0=46, NH=54, TOPPAD=34;
+const COLX=[6,262,486,710,934], COLW=[230,200,200,200,214], NH0=40, NH=54, TOPPAD=34, HW=112;
 let POS={},POS_ALL={};
 function layout(full){
   const NV=full?N:N.filter(n=>nVis(n.id)); NV.forEach(n=>n._vd=full?n.deps.filter(x=>x!=="x_buyer"):vDeps(n)); POS={};
   const c0=NV.filter(n=>n.col===0); let y=TOPPAD;
-  c0.forEach(n=>{POS[n.id]={x:COLX[0],y,w:COLW[0],h:NH0};y+=NH0+6;});
+  const vis0=new Set(c0.map(n=>n.id)), placed=new Set();
+  c0.forEach(n=>{if(placed.has(n.id))return;const m=PAIR_OF[n.id];
+    if(m&&vis0.has(m)){POS[n.id]={x:COLX[0],y,w:HW,h:NH0,half:0};POS[m]={x:COLX[0]+COLW[0]-HW,y,w:HW,h:NH0,half:1};placed.add(m);}
+    else POS[n.id]={x:COLX[0],y,w:COLW[0],h:NH0};
+    y+=NH0+4;});
   const H=y;
   for(let col=1;col<=4;col++){
     const ns=NV.filter(n=>n.col===col);
@@ -1851,17 +1878,26 @@ function buildFlow(){
   svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
   [["Inputs",0],["Calculations",1],["Results",3]].forEach(([t,i])=>el("text",{x:COLX[i],y:18,class:"colhead"},svg).textContent=t);
   const eg=el("g",{},svg), ng=el("g",{},svg); EDGE_EL=[]; NODE_EL={};
-  NV.forEach(n=>n._vd.forEach(d=>{const a=POS[d],b=POS[n.id];if(!a||!b)return;const x1=a.x+a.w,y1=a.y+a.h/2,x2=b.x,y2=b.y+b.h/2;const mx=(x1+x2)/2;
+  NV.forEach(n=>n._vd.forEach(d=>{const a=POS[d],b=POS[n.id];if(!a||!b)return;const x1=a.half!==undefined?COLX[0]+COLW[0]:a.x+a.w,y1=a.half!==undefined?a.y+a.h*(a.half===0?.3:.7):a.y+a.h/2,x2=b.x,y2=b.y+b.h/2;const mx=(x1+x2)/2;
     const p=el("path",{d:`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:"edge"},eg);EDGE_EL.push({from:d,to:n.id,el:p});}));
-  NV.forEach(n=>{const p=POS[n.id];const g=el("g",{class:"node "+(n.type==="input"?"input "+(FOLD_BUY.has(n.id)?"nb":FOLD_DEV.has(n.id)||n.id==="i_dsub"||n.id==="i_nmtc"?"nd":"np"):n.type==="ny"?"ny":n.out?"output":"calc")+(n.id==="x_buyer"?" folded":"")+(n.id==="o_tdc"&&FOLD.dev?" folded":""),transform:`translate(${p.x},${p.y})`,tabindex:"0",role:"button","aria-label":n.label},ng);
+  NV.forEach(n=>{const p=POS[n.id];const g=el("g",{class:"node "+(n.type==="input"?"input "+(FOLD_BUY.has(n.id)?"nb":FOLD_DEV.has(n.id)||n.id==="i_dsub"||n.id==="i_nmtc"?"nd":"np"):n.type==="ny"?"ny":n.out?"output":"calc")+(n.id==="x_buyer"?" folded":"")+(n.id==="o_tdc"&&FOLD.dev?" folded":"")+(ROLL.has(n.id)?" folded rolled":"")+(p.half!==undefined?" half":""),transform:`translate(${p.x},${p.y})`,tabindex:"0",role:"button","aria-label":n.label},ng);
     el("rect",{width:p.w,height:p.h,rx:5,ry:5,class:"box"},g);
     if(n.side) el("rect",{x:0,y:0,width:5,height:p.h,rx:2,fill:n.side==="b"?"var(--side-b)":"var(--side-d)",class:"sidebar"},g);
-    const lb=el("text",{x:11,y:n.col===0?15:17,class:"lbl"},g); lb.dataset.full=n.id==="o_tdc"&&FOLD.dev?"TDC (cost build folded)":n.label; lb.textContent=lb.dataset.full;
-    const v=el("text",{x:11,y:n.col===0?31:37,class:"val"},g);
-    const d=el("text",{x:p.w-8,y:n.col===0?31:37,class:"dlt","text-anchor":"end"},g);
-    el("rect",{x:11,y:p.h-8,width:p.w-20,height:3.5,rx:1.75,class:"itrack"},g);
-    const ib=el("rect",{x:11,y:p.h-8,width:0,height:3.5,rx:1.75,class:"ibar"},g);
-    if(CONF_ABBR[n.conf]&&n.col===0){el("text",{x:p.w-8,y:15,class:"conf","text-anchor":"end",fill:`var(${CONF_VAR[n.conf]||"--tag-ph"})`},g).textContent=CONF_ABBR[n.conf];}
+    const lb=el("text",{x:11,y:n.col===0?14:17,class:"lbl"},g); lb.dataset.full=n.id==="o_tdc"&&FOLD.dev?"TDC (cost build folded)":(p.half!==undefined&&n.short)||n.label; lb.textContent=lb.dataset.full;
+    const v=el("text",{x:11,y:n.col===0?28:37,class:"val"},g);
+    const d=el("text",{x:p.w-8,y:n.col===0?28:37,class:"dlt","text-anchor":"end"},g);
+    const by=n.col===0?p.h-6:p.h-8;
+    el("rect",{x:11,y:by,width:p.w-20,height:3.5,rx:1.75,class:"itrack"},g);
+    const ib=el("rect",{x:11,y:by,width:0,height:3.5,rx:1.75,class:"ibar"},g);
+    if(ROLLABLE.includes(n.id)&&!(FOLD.dev&&(FOLD_DEV.has(n.id)||n.id==="o_tdc"))){
+      const rolled=ROLL.has(n.id),cnt=EX[n.id].size,w=rolled?String(cnt).length*6+14:16;
+      const rb=el("g",{class:"rollbtn"+(rolled?" on":""),transform:`translate(${4-w},4)`,tabindex:"0",role:"button","aria-label":(rolled?"Expand ":"Roll up ")+n.label+": "+cnt+" boxes","aria-pressed":rolled?"true":"false"},g);
+      el("rect",{width:w,height:14,rx:7,class:"rb"},rb);el("text",{x:w/2,y:10.5,"text-anchor":"middle",class:"rt"},rb).textContent=rolled?"+"+cnt:"−";
+      stitle(rb,(rolled?"Expand: show the ":"Roll up: hide the ")+cnt+" boxes that feed only "+n.label+" (inputs that also feed other boxes stay)");
+      const tog=ev=>{ev.stopPropagation();setRoll(n.id,!rolled);};
+      rb.addEventListener("click",tog);rb.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();tog(ev);}});
+    }
+    if(CONF_ABBR[n.conf]&&n.col===0){el("text",{x:p.w-8,y:14,class:"conf","text-anchor":"end",fill:`var(${CONF_VAR[n.conf]||"--tag-ph"})`},g).textContent=CONF_ABBR[n.conf];}
     if(n.term&&GLOSS[n.term]) stitle(g,GLOSS[n.term][0]+": "+GLOSS[n.term][1]);
     NODE_EL[n.id]={g,v,d,ib,lb};
     g.addEventListener("mouseenter",()=>{if(!lock)trace(n.id,"both");});
@@ -1869,7 +1905,7 @@ function buildFlow(){
     g.addEventListener("focus",()=>{if(!lock)trace(n.id,"both");});
     g.addEventListener("blur",()=>untrace());
     g.addEventListener("click",e=>{e.stopPropagation();if(n.id==="x_buyer"){setFold("buyer",false);return;}if(n.id==="o_tdc"&&FOLD.dev&&e.detail>=2){setFold("dev",false);return;}selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);if(lock)scrollRailToNode(n.id);});
-    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);if(lock)scrollRailToNode(n.id);}});
+    g.addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest(".rollbtn"))return;if(e.key==="Enter"||e.key===" "){e.preventDefault();selNode=n.id;renderInspector();markSel();toggleLock(n.id,"both",n.label);if(lock)scrollRailToNode(n.id);}});
   });
   svg.addEventListener("click",e=>{if(!e.target.closest(".node"))setLock(null);});
   markSel();
@@ -1986,8 +2022,8 @@ function goCtl(k){
 }
 
 /* --- impact sizing --- */
-let impTarget="remain", impMode="pct", IMP={}, NIMP={};
-try{const t=localStorage.getItem(LS+"impT"); if(t) impTarget=t; const m=localStorage.getItem(LS+"impM"); if(m==="pct"||m==="range") impMode=m;}catch(e){}
+let impTarget="remain", impWant="remain", impNote="", impMode="pct", IMP={}, NIMP={};
+try{const t=localStorage.getItem(LS+"impT"); if(t){impTarget=t;impWant=t;} const m=localStorage.getItem(LS+"impM"); if(m==="pct"||m==="range") impMode=m;}catch(e){}
 const IMP_T={remain:{node:"o_remain",l:"remaining developer gap",good:-1},devGap:{node:"o_dgap",l:"developer gap",good:-1},salesGap:{node:"o_sgap",l:"sales gap",good:-1},buyerRemain:{node:"o_sgap",l:"remaining buyer gap",good:-1},net:{node:"o_net",l:"owner's net monthly cost",good:-1,mo:true},tdc:{node:"o_tdc",l:"total development cost",good:-1}};
 const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 function evalWith(c,city,v,forceOn){const T=clone(S);setV(c,T,city,v);if(forceOn&&c.toggle)c.toggle(T,city,true);return computeCity(T,city)[impTarget];}
@@ -2008,9 +2044,14 @@ function ctlImpact(c,city){
   return {mag:Math.max(...vs)-Math.min(...vs),dir:0,how:"opts"};
 }
 function computeImpacts(){
-  IMP={};NIMP={}; if(impTarget==="off") return;
-  CTRL.forEach(c=>{if(!c.virtual)IMP[c.k]=ctlImpact(c,focus);});
-  N.forEach(n=>{ if(n.col===0){let best={mag:0,dir:0};(n.ctl||[]).forEach(k=>{if(IMP[k]&&!CTRL_BY[k].discrete&&IMP[k].mag>best.mag)best=IMP[k];});NIMP[n.id]=best;} });
+  impNote=""; if(impWant==="off"){impTarget="off";IMP={};NIMP={};return;}
+  const run=()=>{IMP={};NIMP={};
+    CTRL.forEach(c=>{if(!c.virtual)IMP[c.k]=ctlImpact(c,focus);});
+    N.forEach(n=>{ if(n.col===0){let best={mag:0,dir:0};(n.ctl||[]).forEach(k=>{if(IMP[k]&&!CTRL_BY[k].discrete&&IMP[k].mag>best.mag)best=IMP[k];});NIMP[n.id]=best;} });
+    return Math.max(0,...N.filter(n=>n.col===0).map(n=>NIMP[n.id].mag));};
+  impTarget=impWant; let mx=run();
+  // a result that is already $0 (fully covered) has no inputs that move it, so every line would be thin: size on the developer gap instead
+  if(mx<=0.5&&impWant!=="devGap"&&impWant!=="tdc"){impTarget="devGap";mx=run();impNote=`${IMP_T[impWant].l.charAt(0).toUpperCase()+IMP_T[impWant].l.slice(1)} doesn't change with any single input right now (it is already covered), so lines and bars are sized on the developer gap instead. `;}
 }
 const impFmt=v=>IMP_T[impTarget]&&IMP_T[impTarget].mo?usd(v)+"/mo":usdK(v);
 // Keep each box's label and value inside the box: trim with an ellipsis (the full text is in the box's tooltip and the inspector).
@@ -2033,9 +2074,9 @@ function renderImpact0(){
   const note=document.getElementById("impNote");
   if(!on){note.textContent="Impact sizing is off.";N.forEach(n=>{const o=NODE_EL[n.id];if(!o)return;o.ib.setAttribute("width",0);o.g.querySelectorAll(".itrack").forEach(t=>t.setAttribute("opacity",0));});EDGE_EL.forEach(e=>{e.el.style.strokeWidth="";e.el.classList.remove("flowing");});return;}
   const T=IMP_T[impTarget], upT=UP[T.node];
-  note.textContent = impMode==="pct"
+  note.textContent = impNote + (impMode==="pct"
     ? `Thicker lines and longer bars mean a bigger effect on the ${T.l} in ${focus}. Each input's figure is how much the ${T.l} changes if that input moves 10% (counts move one step; research slots are switched on). A zero means the input isn't the binding limit right now. Design choices are listed separately below the map.`
-    : `Thicker lines and longer bars mean a bigger effect on the ${T.l} in ${focus}. Each input's figure is the swing across that input's researched low-to-high range. Published values have no range and show zero. Provisional ranges are tagged in the list.`;
+    : `Thicker lines and longer bars mean a bigger effect on the ${T.l} in ${focus}. Each input's figure is the swing across that input's researched low-to-high range. Published values have no range and show zero. Provisional ranges are tagged in the list.`);
   const inputs=N.filter(n=>n.col===0); const max=Math.max(1,...inputs.map(n=>NIMP[n.id].mag));
   const ranked=inputs.filter(n=>upT.has(n.id)&&NIMP[n.id].mag>0.5).sort((a,b)=>NIMP[b.id].mag-NIMP[a.id].mag); const rank={};ranked.forEach((n,i)=>rank[n.id]=i+1);
   const ew=new Map();
@@ -2045,10 +2086,11 @@ function renderImpact0(){
     let m=0,cls="ibar";
     if(n.col===0){const I=NIMP[n.id];m=I.mag;const good=I.dir*T.good;cls+=good>0?" good":good<0?" bad":"";}
     o.ib.setAttribute("width",(p.w-20)*Math.min(1,m/max)); o.ib.setAttribute("class",cls);
-    if(n.col===0){ if(!upT.has(n.id)){o.d.textContent="no effect";o.d.setAttribute("class","imp");}
-      else {o.d.textContent=(rank[n.id]&&rank[n.id]<=5?"#"+rank[n.id]+"  ":"")+(m>0.5?"±"+impFmt(m):"0");o.d.setAttribute("class","imp"+(rank[n.id]<=5?" top":""));} }
+    if(n.col===0){ const hf=p.half!==undefined;
+      if(!upT.has(n.id)){o.d.textContent=hf?"–":"no effect";o.d.setAttribute("class","imp");}
+      else {o.d.textContent=(!hf&&rank[n.id]&&rank[n.id]<=5?"#"+rank[n.id]+"  ":"")+(m>0.5?"±"+impFmt(m):"0");o.d.setAttribute("class","imp"+(rank[n.id]<=5?" top":""));} }
   });
-  EDGE_EL.forEach(e=>{const m=ew.get(e)||0; e.el.classList.toggle("flowing",m>0); e.el.style.strokeWidth=m>0?(1+9*Math.pow(m/max,0.8)).toFixed(2):"1";});
+  EDGE_EL.forEach(e=>{const m=ew.get(e)||0; e.el.classList.toggle("flowing",m>0); e.el.style.strokeWidth=m>0?(1.8+8.2*Math.pow(m/max,0.7)).toFixed(2):"1.2";});
   document.getElementById("leversHead").textContent=`Biggest levers on the ${T.l} · ${focus} · ${impMode==="pct"?"10% change":"researched range"}`;
   const ALL=CTRL.map(c=>({c,...IMP[c.k]})).filter(x=>x.mag>0.5).sort((a,b)=>b.mag-a.mag);
   const L=ALL.filter(x=>!x.c.discrete).slice(0,12); const lmax=L.length?L[0].mag:1;
@@ -2804,9 +2846,9 @@ function diffState(a,b,path,out){
   if(Array.isArray(a)||typeof a!=="object"||a===null){if(JSON.stringify(a)!==JSON.stringify(b))out.push([path,a]);return out;}
   Object.keys(a).forEach(k=>diffState(a[k],b?b[k]:undefined,path.concat(k),out));return out;
 }
-function encodeState(){const d=diffState(S,DEFAULTS,[],[]);const o={v:2,c:focus,d};const j=JSON.stringify(o);return btoa(unescape(encodeURIComponent(j))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function encodeState(){const d=diffState(S,DEFAULTS,[],[]);const o={v:2,c:focus,d};if(ROLL.size)o.r=[...ROLL];if(FOLD.buyer||FOLD.dev)o.f=FOLD;const j=JSON.stringify(o);return btoa(unescape(encodeURIComponent(j))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
 function decodeState(code){try{const b=code.replace(/-/g,"+").replace(/_/g,"/");const j=decodeURIComponent(escape(atob(b+"===".slice((b.length+3)%4))));const o=JSON.parse(j);if(!o||!Array.isArray(o.d))return null;
-  const T=clone(DEFAULTS);o.d.forEach(([p,v])=>{if(!Array.isArray(p)||!p.length)return;if(!["shared","cities","ov","port"].includes(p[0]))return;if(p[0]==="port"&&p.length===1){T.port=v;return;}let x=T;for(let i=0;i<p.length-1;i++){if(x[p[i]]===undefined||typeof x[p[i]]!=="object")x[p[i]]={};x=x[p[i]];}x[p[p.length-1]]=v;});if(!METHODS.includes(T.shared.method))T.shared.method=/stick/i.test(T.shared.method)?"Stick-built":"Volumetric modular";return {S:T,c:CITIES.includes(o.c)?o.c:null};}catch(e){return null;}}
+  const T=clone(DEFAULTS);o.d.forEach(([p,v])=>{if(!Array.isArray(p)||!p.length)return;if(!["shared","cities","ov","port"].includes(p[0]))return;if(p[0]==="port"&&p.length===1){T.port=v;return;}let x=T;for(let i=0;i<p.length-1;i++){if(x[p[i]]===undefined||typeof x[p[i]]!=="object")x[p[i]]={};x=x[p[i]];}x[p[p.length-1]]=v;});if(!METHODS.includes(T.shared.method))T.shared.method=/stick/i.test(T.shared.method)?"Stick-built":"Volumetric modular";return {S:T,c:CITIES.includes(o.c)?o.c:null,r:Array.isArray(o.r)?o.r.filter(x=>ROLLABLE.includes(x)):null,f:o.f&&typeof o.f==="object"?{buyer:!!o.f.buyer,dev:!!o.f.dev}:null};}catch(e){return null;}}
 function shareUrl(){return PUBLIC_URL+"#s."+encodeState();}
 let hashT;
 function syncHash(){ if(!/github\.io$/.test(location.hostname)) return; clearTimeout(hashT); hashT=setTimeout(()=>{try{const d=diffState(S,DEFAULTS,[],[]);history.replaceState(null,"",d.length?"#s."+encodeState():location.pathname);}catch(e){}},400);}
@@ -3098,10 +3140,10 @@ function update(noPulse){
 }
 
 /* ===================== INIT ===================== */
-(function initFromHash(){const h=location.hash||"";if(h.startsWith("#s.")){const r=decodeState(h.slice(3));if(r){S=r.S;if(r.c)focus=r.c;}}})();
+(function initFromHash(){const h=location.hash||"";if(h.startsWith("#s.")){const r=decodeState(h.slice(3));if(r){S=r.S;if(r.c)focus=r.c;if(r.r){ROLL=new Set(r.r);calcRoll();}if(r.f)Object.assign(FOLD,r.f);}}})();
 buildCitySeg(); buildControls(); buildFlow(); buildSweepPickers(); renderGloss();
-document.getElementById("impT").value=impTarget;
-document.getElementById("impT").onchange=e=>{impTarget=e.target.value;try{localStorage.setItem(LS+"impT",impTarget);}catch(x){}update(true);};
+document.getElementById("impT").value=impWant;
+document.getElementById("impT").onchange=e=>{impWant=impTarget=e.target.value;try{localStorage.setItem(LS+"impT",impTarget);}catch(x){}update(true);};
 document.querySelectorAll("#impMode button").forEach(b=>b.onclick=()=>{impMode=b.dataset.m;try{localStorage.setItem(LS+"impM",impMode);}catch(x){}update(true);});
 ["build","present","explain","explore","inputs"].forEach(m=>document.getElementById("m-"+m).onclick=()=>setMode(m));
 document.getElementById("bPrev").onclick=()=>{if(bStep>0){bStep--;applyBuildRail();renderBuild();window.scrollTo({top:0});}};
