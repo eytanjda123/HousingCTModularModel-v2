@@ -1995,7 +1995,7 @@ function renderKPIs(){
     {l:"Remaining buyer gap",t:"buyerRemain",r:"buyerRemain",fmt:"usd",good:-1,side:"b",s:R.salesGapAll<0.5?`No sales gap: the buyer can pay ${usdK(R.afford)}`:(R.buyerRemain<0.5?`Sales gap ${usdK(R.salesGapAll)}, filled by the DOH homebuyer subsidy`:`Sales gap ${usdK(R.salesGapAll)} after Time To Own`)},
     {l:"Owner's net monthly cost",t:"net",r:"net",fmt:"usd",good:-1,side:"b",s:`${pct(R.netPct,1)} of income · MIT residual ${usdK(R.residual)}/yr`}
   ];
-  document.getElementById("kpis").innerHTML=`<div class="kpirow kpi-d"><span class="kpihead">Developer budget</span>`+K.slice(0,3).map(kpiHTML).join("")+`</div><div class="kpirow kpi-b"><span class="kpihead">Buyer analysis${R.condo?" · all condo buyers":""}</span>`+K.slice(3).map(kpiHTML).join("")+`</div>`;
+  document.getElementById("kpis").innerHTML=`<div class="kpirow kpi-b"><span class="kpihead">Buyer analysis${R.condo?" · all condo buyers":""}</span>`+K.slice(3).map(kpiHTML).join("")+`</div><div class="kpirow kpi-d"><span class="kpihead">Developer budget</span>`+K.slice(0,3).map(kpiHTML).join("")+`</div>`;
   function kpiHTML(k){return `<div class="kpi"><span class="eyebrow"><span class="term" tabindex="0" data-term="${k.t}">${k.l}</span> · ${focus}</span><span class="v">${usd(R[k.r])}${k.r==="net"?'<small style="font-size:.6em;color:var(--ink-3)">/mo</small>':""}</span>${chip(R[k.r]-B[k.r],k.fmt,k.good)}<span class="s">${k.s}</span></div>`;}
 }
 function renderInspector(){
