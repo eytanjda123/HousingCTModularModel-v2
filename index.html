@@ -576,6 +576,7 @@ table.sm-sites small{display:block;color:var(--ink-3);font-size:.72rem}
 table.sm-sites tr.off th,table.sm-sites tr.off td{opacity:.55}
 .sm-two{display:grid;grid-template-columns:1fr;gap:12px}
 .sm-lines{margin-top:8px}.sm-lines summary{cursor:pointer;font-size:.86rem;color:var(--accent)}
+.sm-key{display:inline-flex;align-items:center;gap:4px;margin-right:10px;white-space:nowrap}.sm-key i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--rule)}
 .sm-map{font-size:.84rem;color:var(--ink-2);margin:6px 0 0;padding-left:18px}
 #smCtls .ctl-grp{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 -2px}
 @media (max-width:1100px){.sm-kpis{grid-template-columns:1fr 1fr}.sm-two{grid-template-columns:1fr}}
@@ -4139,12 +4140,14 @@ function renderSimple(){
   const at=(m,a)=>{const T=cityState(S,focus);T.cities[focus].mill=m;T.shared.ny.abate.on=a>0;T.shared.ny.abate.val=a;return compute(T,focus);};
   const G=mills.map(m=>ab.map(a=>{const X=at(m,a);const px=X.salesTotal-X.salesGapAll;return {af:X.afford,gap:Math.max(0,cm.tdc-px)};}));
   const gmin=Math.min(...G.flat().map(x=>x.gap)), gmax=Math.max(...G.flat().map(x=>x.gap));
-  const shade=v=>gmax>gmin?`style="background:color-mix(in srgb,var(--bad) ${Math.round(6+28*(v-gmin)/(gmax-gmin))}%,transparent)"`:"";
+  const heat=(v,lo,hi,good)=>{if(!(hi>lo))return "";const t=(v-lo)/(hi-lo);const w=good?t:1-t;const col=w>=0.5?"var(--good)":"var(--bad)";return `style="background:color-mix(in srgb,${col} ${Math.round(4+26*Math.abs(w-0.5)*2)}%,transparent)"`;};
+  const shade=v=>heat(v,gmin,gmax,false);
+  const afs=G.flat().map(x=>x.af), amin=Math.min(...afs), amax=Math.max(...afs);
   h+=`<h3>5 · Sensitivity: property tax vs affordable price</h3><div class="sm-two"><div class="tblwrap"><table class="ho sm-t sm-grid"><caption>Affordable price (buyer)</caption><thead><tr><th>Mill rate ↓ · abatement →</th>${ab.map(a=>`<th>${pct(a)}</th>`).join("")}</tr></thead><tbody>
-    ${mills.map((m,i)=>`<tr><th scope="row">${m}${i===0?" (now)":""}</th>${G[i].map(x=>`<td>${usdK(x.af)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    ${mills.map((m,i)=>`<tr><th scope="row">${m}${i===0?" (now)":""}</th>${G[i].map(x=>`<td ${heat(x.af,amin,amax,true)}>${usdK(x.af)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
     <div class="tblwrap"><table class="ho sm-t sm-grid"><caption>Modular subsidy needed at that price</caption><thead><tr><th>Mill rate ↓ · abatement →</th>${ab.map(a=>`<th>${pct(a)}</th>`).join("")}</tr></thead><tbody>
     ${mills.map((m,i)=>`<tr><th scope="row">${m}${i===0?" (now)":""}</th>${G[i].map(x=>`<td ${shade(x.gap)}>${usdK(x.gap)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>
-    <p class="note">Abatement raises what the buyer can afford (less of the budget goes to tax), which lowers the subsidy until the price hits appraised value; past that point it doesn't help. Tax is on the appraised value, as CT law requires (Prof. Cooney's file taxes the sale price).</p>`;
+    <p class="note"><span class="sm-key"><i style="background:color-mix(in srgb,var(--good) 30%,transparent)"></i>better</span><span class="sm-key"><i style="background:color-mix(in srgb,var(--bad) 30%,transparent)"></i>worse</span> Shading compares the cells within each grid; a grid with no shading doesn't change across it. Abatement raises what the buyer can afford (less of the budget goes to tax), which lowers the subsidy until the price hits appraised value; past that point it doesn't help. Tax is on the appraised value, as CT law requires (Prof. Cooney's file taxes the sale price).</p>`;
   // program roll-up
   const on=SM_SITES.filter(x=>x.on), vol=Math.max(1,on.length);
   const rr=SM_SITES.map(x=>{if(!x.on)return {x};
@@ -4153,13 +4156,15 @@ function renderSimple(){
     const Ts=st("Stick-built"), Tm=st("Volumetric modular"), A=compute(Ts,x.city), B=compute(Tm,x.city);
     const a=smCost(A,Ts.shared,true), b=smCost(B,Tm.shared,false), sl=smSale(B), gap=Math.max(0,b.tdc-sl.price), gapS=Math.max(0,a.tdc-sl.price), pr=smProgs(B,Tm.shared,b.tdc);
     return {x,ts:a.tdc,tm:b.tdc,val:B.salesTotal,price:sl.price,gap,gapS,prog:pr.used+B.hbAll,rem:Math.max(0,gap-pr.used-B.hbAll),owners:B.condo?x.u:1};});
+  const onR=rr.filter(r=>r.x.on), rng=k=>{const v=onR.map(r=>r[k]);return [Math.min(...v),Math.max(...v)];};
+  const hc=(r,k,good,perU)=>{const f=x=>perU?x[k]/x.x.u:x[k];const v=onR.map(f);return heat(f(r),Math.min(...v),Math.max(...v),good);};
   const tot=k=>rr.filter(r=>r.x.on).reduce((t,r)=>t+r[k],0), units=on.reduce((t,x)=>t+x.u,0), owners=tot("owners");
   h+=`<h3>6 · Program roll-up: land bank sites</h3>
-   <p class="note">Sites from the F26 template (placeholder addresses). Each included site is costed with its own unit count and valued from its neighborhood comps (75th-percentile price per sq ft × our sq ft; Waterbury uses citywide values). Buildings are treated as one order of ${vol}, so the order-volume inputs (factory price drop per doubling: ${pct(s.cost.fact.learn,1)}; repeated design: ${pct(s.designRepeat)}) apply. Tick sites in or out; your picks stay in this browser.</p>
+   <p class="note">Sites from the F26 template (placeholder addresses). Each included site is costed with its own unit count and valued from its neighborhood comps (75th-percentile price per sq ft × our sq ft; Waterbury uses citywide values). Buildings are treated as one order of ${vol}, so the order-volume inputs (factory price drop per doubling: ${pct(s.cost.fact.learn,1)}; repeated design: ${pct(s.designRepeat)}) apply. Tick sites in or out; your picks stay in this browser. Shading compares sites <b>per unit</b> (so 2- and 4-unit buildings compare fairly): <span class="sm-key"><i style="background:color-mix(in srgb,var(--good) 30%,transparent)"></i>lower cost or gap, higher value</span><span class="sm-key"><i style="background:color-mix(in srgb,var(--bad) 30%,transparent)"></i>the reverse</span></p>
    <div class="tblwrap"><table class="ho sm-t sm-sites"><thead><tr><th>In</th><th>Site</th><th>Neighborhood</th><th>Units</th><th>TDC stick</th><th>TDC modular</th><th>Market value</th><th>Sale price</th><th>Subsidy needed</th><th>Programs</th><th>Left</th></tr></thead><tbody>
    ${rr.map(r=>`<tr class="${r.x.on?"":"off"}"><td><input type="checkbox" data-sm="${r.x.id}" ${r.x.on?"checked":""} aria-label="Include ${r.x.id}"></td><th scope="row">${r.x.id} <small>${esc(r.x.city)} · ${esc(r.x.addr)}</small></th><td>${esc(r.x.nb||"citywide")}</td>
      <td><select data-smu="${r.x.id}" aria-label="Units at ${r.x.id}">${[2,3,4].map(n=>`<option ${n===r.x.u?"selected":""}>${n}</option>`).join("")}</select></td>
-     ${r.x.on?`<td>${usdK(r.ts)}</td><td>${usdK(r.tm)}</td><td>${usdK(r.val)}</td><td>${usdK(r.price)}</td><td>${usdK(r.gap)}</td><td>${usdK(r.prog)}</td><td class="${r.rem>0.5?"neg":""}">${usdK(r.rem)}</td>`:`<td colspan="7" class="sm-n">not in the program</td>`}</tr>`).join("")}
+     ${r.x.on?`<td ${hc(r,"ts",false,true)}>${usdK(r.ts)}</td><td ${hc(r,"tm",false,true)}>${usdK(r.tm)}</td><td ${hc(r,"val",true,true)}>${usdK(r.val)}</td><td ${hc(r,"price",true,true)}>${usdK(r.price)}</td><td ${hc(r,"gap",false,true)}>${usdK(r.gap)}</td><td>${usdK(r.prog)}</td><td class="${r.rem>0.5?"neg":""}" ${hc(r,"rem",false,false)}>${usdK(r.rem)}</td>`:`<td colspan="7" class="sm-n">not in the program</td>`}</tr>`).join("")}
    </tbody></table></div>
    <div class="tblwrap"><table class="ho sm-t"><thead><tr><th>Program (${on.length} buildings)</th><th>Stick-built</th><th>Modular</th><th>Modular − stick</th></tr></thead><tbody>
     <tr><th scope="row">Homes: ${units} (${owners} owner-occupied, ${units-owners} rental)</th><td></td><td></td><td></td></tr>
