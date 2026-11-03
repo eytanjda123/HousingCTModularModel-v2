@@ -44,10 +44,10 @@ def put(ws, ref, val, font=body, fmt=None, fill=None, al=None):
 # ============================================================ SOURCES
 U = {
  'doh': 'https://portal.ct.gov/-/media/doh/homeownership-initiative/doh-homeownership-developer-subsidy-initiative-published-03-21-2024.pdf',
- 'tto': 'https://www.supermoney.com/chfa-time-to-own-program', 'hdf': 'https://hartfordbusiness.com/article/lamont-announces-30m-fund-to-incentivize-homeownership/',
- 'ahp': 'https://www.fhlbboston.com/?p=10990', 'htcc': 'https://www.housingonline.com/?p=74603', 'hudil': 'https://www.huduser.gov/portal/datasets/il.html',
+ 'tto': 'https://www.chfa.org/assets/1/19/000_LPO_Final_Rev_11.13.2025_Final1.pdf?14506=', 'hdf': 'https://portal.ct.gov/governor/news/press-releases/2025/04-2025/governor-lamont-announces-ct-home-funds', 'dep26': 'https://portal.ct.gov/-/media/doh/dep-requirements-and-instructions-spring-2026.pdf', 'fhfaAhp': 'https://www.fhfa.gov/programs/affordable-housing-program', 'nhDpa': 'https://newhavenct.gov/government/departments-divisions/economic-development-administration/housing-administration-and-development/homebuyers/down-payment-closing-cost-assistance-financing', 'yale': 'https://your.yale.edu/working-at-yale/benefits/your-finances/homebuyer-program',
+ 'ahp': 'https://www.fhlbboston.com/?p=10990', 'htcc': 'https://www.chfa.org/assets/1/19/FINAL_2025_Guidelines.pdf?14018=', 'hudil': 'https://www.huduser.gov/portal/datasets/il.html',
  'chfa': 'https://www.chfa.org/homebuyer-mortgage-interest-rates-/', 'pmms': 'https://www.freddiemac.com/pmms',
- 'mip': 'https://www.thetruthaboutmortgage.com/annual-mortgage-insurance-premium-on-fha-loans-reduced-30-basis-points/',
+ 'mip': 'https://archives.hud.gov/news/2024/2023-05hsgml.pdf',
  'ccm': 'https://hub.ccm-ct.org/community/new-haven/', 'nw': 'https://www.nerdwallet.com/insurance/homeowners/connecticut-home-insurance',
  'mit': 'https://livingwage.mit.edu/metros/35300', 'cama': 'https://portal.ct.gov/opm/igpp/data-analytics/parcel-data',
  'ecc': 'https://elmcitycommunities.org/wp-content/uploads/2024/02/2024-Utility-allowance-schedule.pdf',
@@ -287,7 +287,7 @@ add('nbPsf', 'Neighborhood $/sq ft, new-build adjusted (for the neighborhood-com
 add('prec', 'New-build value (appraisal precedent)', 420000, USD, CB, 'Redacted New Haven DOH Consolidated Application (2025): fair market value of a new 2,800 sq ft 2-family. Used for every city until each has its own comparable.')
 add('custom', 'Size-adjusted new-build value (base case)', 340000, USD, SE, 'The $420K DOH precedent scaled to our 2,274 sq ft; in line with 2024-25 resales of new two-families in Hartford ($133-$151/sq ft: 90-92 Mather St $459,900; 197-199 Bond St $385,000), 2025 CT Parcel and CAMA data: https://catalog.data.gov/dataset/2025-connecticut-parcel-and-cama-data Replace with an appraiser\'s opinion.')
 add('lb', 'Land bank market value, new two-family', 429000, USD, LB, NHLB + ' $429,000 for a new 2,400 sq ft two-family; applied to every city until each has its own.')
-add('dpa', 'City down-payment assistance per buyer (focus city)', 20000, USD, LB, NHLB + ' City of New Haven DPA: $20,000 in the spreadsheet and webinar, $10,000 in the cost table (confirm). $0 for Hartford and Waterbury.')
+add('dpa', 'City down-payment assistance per buyer (focus city)', 20000, USD, LB, NHLB + ' City of New Haven page: greater of 6% of price or $20,000, 5-year forgivable, first-time low-income buyers (income cap not stated): ' + U['nhDpa'] + ' Hartford and Waterbury not researched ($0).')
 add('basis', 'Appraisal basis used for the sale', B_CUST, None, TC, 'Base case: size-adjusted new-build value. The Appraisal Cases tab runs all four cases side by side.', BASIS)
 add('mill', 'Mill rate (focus city)', 39.96, DEC, V, 'Confirmed with each city tax office (team, Oct 2026): New Haven 39.96 (Tax Collector Division), Hartford 69.95 (Tax Assessor), Waterbury 43.34 (Tax Assessor).')
 add('assess', 'Assessment ratio, 1-3 unit homes (focus city)', 0.7, PCT1, PL, 'CGS Sec. 12-62a: 70% of fair market value (' + U['olr'] + '). Hartford uses 36.8% for 1-3 unit residential (effective tax rate ~2.57%); law team to review.')
@@ -300,7 +300,7 @@ sect('9. BUYER FINANCING')
 add('rate', 'Mortgage rate', 0.065, '0.000%', SE, 'CHFA government-insured 6.75% less 0.25% Targeted Area discount (CHFA, Oct 2026): ' + U['chfa'] + ' Market average 7.32% (Freddie Mac PMMS, Oct 22, 2026).')
 add('term', 'Mortgage term (years)', 30, NUM, TC, 'Standard 30-year fixed.')
 add('dp', 'Down payment', 0.035, PCT1, PL, 'FHA minimum for owner-occupied 1-4 unit homes (HUD Handbook 4000.1).')
-add('mip', 'FHA mortgage insurance (annual)', 0.0055, PCT2, PL, 'FHA annual MIP above 95% LTV: ' + U['mip'])
+add('mip', 'FHA mortgage insurance (annual)', 0.0055, PCT2, PL, 'HUD ML 2023-05: 0.55% above 95% LTV: ' + U['mip'] + ' Assumes FHA; a CHFA conventional loan would use private mortgage insurance.')
 add('rentCredit', 'Lender credit on rental income', 0.75, PCT, PL, 'CT DOH outline p.9: 75% of future gross rent: ' + U['doh'])
 add('lenderCap', 'Test A: lender cap, housing share of qualifying income', 0.40, PCT1, TC, 'Conservative team assumption; FHA allows 31%-46.9%.')
 add('ownerCap', "Test B: owner cap, share of own income", 0.30, PCT, PL, 'HUD affordability standard: 30% of income.')
@@ -316,23 +316,23 @@ add('mitType', 'Household type for the MIT living-wage test', MIT[1][0], None, T
 add('energyThresh', 'High energy burden threshold', 0.06, PCT, V, 'ACEEE: above 6% of income is a high energy burden.')
 sect('11. BUYER-SIDE MONEY (fills the sales gap only)')
 add('incAssist', 'Include buyer assistance (Time To Own etc.)?', 'Yes', None, TC, '', YN)
-add('tto', 'CHFA Time To Own, max per buyer', 18750, USD, PL, 'Up to $25,000 at or below 80% AMI; $18,750 at 80-100% (the default, for a 100% AMI buyer): ' + U['tto'])
-add('empDpa', 'Employer down-payment assistance per buyer (e.g., Yale)', 0, USD, PH, 'Placeholder slot named in the land bank webinar; $0 until confirmed.')
+add('tto', 'CHFA Time To Own, max per buyer', 18750, USD, PL, 'CHFA Loan Program Outlines rev. 11/13/2025: $25,000 at or below 80% AMI; $18,750 above 80% to 100%; none above 100%. Needs a CHFA first mortgage; CHFA FHA loans exclude 2-4 units (VA only). OPEN: which first mortgage the two-family buyer uses: ' + U['tto'])
+add('empDpa', 'Employer down-payment assistance per buyer (e.g., Yale)', 0, USD, PH, 'Yale Homebuyer Program: $30,000 over 10 years ($7,500 at closing, taxable), Yale staff only: ' + U['yale'] + ' $0 by default.')
 add('otherAssist', 'Other buyer assistance (e.g., FHLBank Equity Builder)', 0, USD, PH, 'Off by default; Equity Builder up to $32,099.')
-add('useHB', 'Fill the sales gap with a DOH homebuyer subsidy?', 'Yes', None, CB, 'The redacted New Haven DOH application funds a homebuyer subsidy (FMV - affordable price).', YN)
+add('useHB', 'Fill the sales gap with a DOH homebuyer subsidy?', 'Yes', None, CB, 'INFERENCE from the redacted New Haven DOH application. DOH rules size one gap to an affordable price (100% AMI in the 2024 draft, 80% AMI in the Spring 2026 DEP): ' + U['dep26'] + ' OPEN: does DOH fund a separate homebuyer subsidy?')
 sect('12. DEVELOPER-SIDE MONEY (fills the developer gap, in this order)')
 add('incHdf', 'Include HDF / CT Home Funds?', 'Yes', None, TC, '', YN)
-add('hdf', 'HDF / CT Home Funds grant, per home', 150000, USD, PL, 'Up to $150,000 per home, up to 10 homes per grant: ' + U['hdf'] + ' Stacking with DOH: law team to confirm.')
-add('incAhp', 'Include FHLBank Boston AHP?', 'No', None, TC, CHFAM + ' Upside only: needs a sponsoring member bank.', YN)
+add('hdf', 'HDF / CT Home Funds grant, per home', 150000, USD, PL, 'CT Home Funds Homeownership Construction Program (Apr 2025): grants up to $150,000 per home, up to ten homes: ' + U['hdf'] + ' OPEN: stacking with DOH; buyer income limit.')
+add('incAhp', 'Include FHLBank Boston AHP?', 'No', None, TC, 'Off: AHP owner units must be at or below 80% AMI (FHFA: ' + U['fhfaAhp'] + '); needs a member bank; 2026 round closed.')
 add('ahp', 'FHLBank Boston AHP, per home', 100000, USD, PL, 'Up to $100,000 per homeownership unit: ' + U['ahp'])
 add('incHtcc', 'Include CHFA HTCC?', 'Yes', None, TC, '', YN)
-add('htcc', 'HTCC award to a nonprofit sponsor', 500000, USD, PL, 'Up to $500,000 per applicant: ' + U['htcc'] + ' New Haven 2-unit pilot received $500K: ' + U['pilot'])
+add('htcc', 'HTCC award to a nonprofit sponsor', 500000, USD, PL, 'CHFA HTCC guidelines rev. 3/2025: up to $500,000 per applicant and per development per year; owners at or below 100% AMI: ' + U['htcc'] + ' New Haven 2-unit pilot received $500K: ' + U['pilot'])
 add('htccHomes', 'Homes sharing one HTCC award', 10, NUM, TC, 'One award spread across a 10-building phase.')
-add('htccMode', 'How the HTCC award is used', HTCC_T[0], None, TC, 'Revolving: the award finances construction (lower loan interest) and is repaid from sales, instead of filling the gap. Precedents: Capital for Change loan pool (2021), revolving funds (2024). Confirm with CHFA.', HTCC_T)
+add('htccMode', 'How the HTCC award is used', HTCC_T[0], None, TC, 'INFERENCE: HTCC guidelines describe revolving funds for buyer costs (down payment, buydowns, closing, rehab), not construction loans; a 2021 Capital for Change pool did fund construction loans. OPEN: confirm with CHFA.')
 add('htccTurns', 'HTCC fund: times it turns over during the phase', 2, DEC, PH, 'Working estimate 2-3.')
 add('htccRate', 'HTCC fund: interest it charges', 0, PCT2, PH, 'Placeholder.')
 add('incDohRent', 'Include a DOH rental subsidy for the rental unit(s)?', 'No', None, TC, CHFAM + ' Pending the law team. Not counted for a condo.', YN)
-add('dohRent', 'DOH rental subsidy per rental unit', 100000, USD, PH, CHFAM + ' About $150K per unit at 50% AMI, $100K at 60%.')
+add('dohRent', 'DOH rental subsidy per rental unit', 100000, USD, PH, 'Spring 2026 DEP: DOH targets $100K per assisted unit at 60-80% AMI, $150K at or below 50%: ' + U['dep26'] + ' INFERENCE: applying it to the rental unit of an owner-occupied two-family.')
 add('incNmtc', 'Include New Markets Tax Credits (when switched on below)?', 'Yes', None, TC, 'Outside the base case: NMTC fits a condo scenario better. LIHTC is off the table for owner-occupied homes and not modeled.', YN)
 add('nmtcOn', 'NMTC: use New Markets Tax Credits?', 'No', None, TC, 'Off by default. See the NMTC tab.', YN)
 add('nmtcHomes', 'NMTC: homes in the transaction', 10, NUM, SE, 'For-sale NMTC deals typically 10-20 homes, $5-10M: ' + U['novo'])
@@ -341,7 +341,7 @@ add('nmtcCredit', 'NMTC: credit rate over 7 years', 0.39, PCT, PL, 'Set by law (
 add('nmtcPrice', 'NMTC: investor price per $1 of credit', 0.80, USD2, SE, '$0.77 (Chicago Development Fund) to $0.83 (NY Fed): ' + U['nyfed'])
 add('nmtcCosts', 'NMTC: fees and transaction costs (share of QEI)', 0.14, PCT1, SE, 'Backed out of the NY Fed 15-20% net-benefit range at $0.80 pricing.')
 add('incDoh', 'Include DOH developer subsidy?', 'Yes', None, TC, '', YN)
-add('dohUnit', 'DOH developer subsidy, per unit', 150000, USD, LB, NHLB + ' $150,000 per unit (webinar). DOH sizes awards to the gap; precedents ran $230K-$650K per building: ' + U['hazel'])
+add('dohUnit', 'DOH developer subsidy, per unit', 150000, USD, LB, NHLB + ' INFERENCE: $150K per unit is the land bank planning figure, not a DOH cap. DOH sizes the gap to an affordable price (100% AMI in the 2024 draft, 80% in the Spring 2026 DEP); total cost per home must be at or below the CHFA Bond Sales Price Limit: ' + U['dep26'])
 
 # ---- write Inputs
 ws = wb.create_sheet('Inputs', 0)
