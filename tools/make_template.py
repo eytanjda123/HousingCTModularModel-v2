@@ -88,8 +88,8 @@ def sidefill(k):
 
 BRS = ['Studio', '1BR', '2BR', '3BR', '4BR']
 METHODS = ['Volumetric modular', 'Stick-built']
-BASIS = ['Existing-home value (CAMA median)', 'Size-adjusted new-build value (base case)', 'New-build value (DOH precedent)', 'Land bank market value (new 2,400 sq ft two-family)', 'Sales comps: 75th-percentile $/sq ft \u00d7 our size']
-B_CAMA, B_CUST, B_PREC, B_LB, B_COMPS = BASIS
+BASIS = ['Existing-home value (CAMA median)', 'Size-adjusted new-build value (base case)', 'New-build value (DOH precedent)', 'Land bank market value (new 2,400 sq ft two-family)', 'Sales comps: 75th-percentile $/sq ft \u00d7 our size', "Neighborhood comps: the site's neighborhood $/sq ft \u00d7 our size"]
+B_CAMA, B_CUST, B_PREC, B_LB, B_COMPS, B_NBHD = BASIS
 TAXB = ['Appraised value (Connecticut law)', 'Existing-home value (restricted-value case)', 'Custom assessed value', 'Price the buyer can pay (affordable-price case)']
 CAPB = ['All housing costs (mortgage, tax, insurance, utilities)', 'Mortgage payment only, with an all-in ceiling']
 FEEB = ['Total costs before the fee', 'Hard (construction) costs', 'Sales proceeds (land bank method)']
@@ -282,6 +282,8 @@ add('med46', 'Median sale, existing four-families (used for 4-6 units)', 535000,
 add('psf2', '75th-percentile price per sq ft, existing two-families', 197.03, USD2, V, 'Same source: CAMA-matched living area. The comps appraisal = this x our net sq ft.')
 add('psf3', '75th-percentile price per sq ft, existing three-families', 164.43, USD2, V, 'Same source.')
 add('psf46', '75th-percentile price per sq ft, existing four-families', 190.42, USD2, V, 'Same source.')
+add('nbName', 'Site neighborhood (focus city)', 'Citywide (no neighborhood)', None, TC, 'Set in the explorer; Waterbury uses assessor neighborhood codes.')
+add('nbPsf', 'Neighborhood $/sq ft, new-build adjusted (for the neighborhood-comps basis)', 197.03, USD2, SE, "The neighborhood's median $/sq ft (two-family sales where 5+, else all 2-4 family) x the city's 75th-pct / median $/sq ft. Written by the explorer; citywide 75th pct when no neighborhood is set. " + OPMS)
 add('prec', 'New-build value (appraisal precedent)', 420000, USD, CB, 'Redacted New Haven DOH Consolidated Application (2025): fair market value of a new 2,800 sq ft 2-family. Used for every city until each has its own comparable.')
 add('custom', 'Size-adjusted new-build value (base case)', 340000, USD, SE, 'The $420K DOH precedent scaled to our 2,274 sq ft; in line with 2024-25 resales of new two-families in Hartford ($133-$151/sq ft: 90-92 Mather St $459,900; 197-199 Bond St $385,000), 2025 CT Parcel and CAMA data: https://catalog.data.gov/dataset/2025-connecticut-parcel-and-cama-data Replace with an appraiser\'s opinion.')
 add('lb', 'Land bank market value, new two-family', 429000, USD, LB, NHLB + ' $429,000 for a new 2,400 sq ft two-family; applied to every city until each has its own.')
@@ -428,6 +430,7 @@ SC.append(('prec', 'Appraisal: DOH precedent', {'basis': 'prec'}))
 SC.append(('cust', 'Appraisal: size-adjusted base case', {'basis': 'custom'}))
 SC.append(('lbv', 'Appraisal: land bank value', {'basis': 'lb'}))
 SC.append(('cmp', 'Appraisal: sales comps', {'basis': 'comps'}))
+SC.append(('nbv', 'Appraisal: neighborhood comps', {'basis': 'nbhd'}))
 for tb, tl in [('fmv', 'appraised value'), ('aff', 'affordable price'), ('cama', 'existing-home value')]:
     for a in AMIS: SC.append(('tx_%s_%g' % (tb, a), 'Tax on %s, %d%% AMI' % (tl, a * 100), {'taxb': tb, 'ami': a}))
 for cb, cl in [('allin', '30% all-in'), ('pi', '30% mortgage only')]:
@@ -490,7 +493,7 @@ L('method', 'Construction method', 'IF({ov_method}="",%s,{ov_method})' % IN('met
 L('volume', 'Order volume', 'IF({ov_volume}="",%s,{ov_volume})' % IN('volume'), NUM)
 L('rate', 'Mortgage rate', 'IF({ov_rate}="",%s,{ov_rate})' % IN('rate'), PCT2)
 L('dp', 'Down payment', 'IF({ov_dp}="",%s,{ov_dp})' % IN('dp'), PCT1)
-L('basis', 'Appraisal basis code', 'IF({ov_basis}="",IF(%s="%s","prec",IF(%s="%s","custom",IF(%s="%s","lb",IF(%s="%s","comps","cama")))),{ov_basis})' % (IN('basis'), B_PREC, IN('basis'), B_CUST, IN('basis'), B_LB, IN('basis'), B_COMPS), '@')
+L('basis', 'Appraisal basis code', 'IF({ov_basis}="",IF(%s="%s","prec",IF(%s="%s","custom",IF(%s="%s","lb",IF(%s="%s","comps",IF(%s="%s","nbhd","cama"))))),{ov_basis})' % (IN('basis'), B_PREC, IN('basis'), B_CUST, IN('basis'), B_LB, IN('basis'), B_COMPS, IN('basis'), B_NBHD), '@')
 L('taxb', 'Property tax basis code', 'IF({ov_taxb}="",IF(%s="%s","cama",IF(%s="%s","custom",IF(%s="%s","aff","fmv"))),{ov_taxb})' % (IN('taxBasis'), TAXB[1], IN('taxBasis'), TAXB[2], IN('taxBasis'), TAXB[3]), '@')
 L('capb', 'Owner cap basis code', 'IF({ov_capb}="",IF(%s="%s","pi","allin"),{ov_capb})' % (IN('capBasis'), CAPB[1]), '@')
 L('feeb', 'Developer fee basis code', 'IF({ov_feeb}="",IF(%s="%s","hard",IF(%s="%s","sales","pre")),{ov_feeb})' % (IN('feeBasis'), FEEB[1], IN('feeBasis'), FEEB[2]), '@')
@@ -653,8 +656,9 @@ L('grossRent', 'Gross rent (all rental units; 0 for a condo)', 'IF({condo}=1,0,{
 L('collected', 'Rent collected after vacancy', '{grossRent}*(1-%s)' % IN('vac'), USD2)
 L('lenderRentM', 'Rent a lender counts', '{grossRent}*%s' % IN('rentCredit'), USD2)
 L('med', 'Existing-home median for this building size', 'IF({units}<=2,%s,IF({units}=3,%s,%s))' % (IN('med2'), IN('med3'), IN('med46')))
+L('nbVal', 'Neighborhood comps value: neighborhood $/sq ft x net sq ft', '%s*{tsf}' % IN('nbPsf'))
 L('compsVal', 'Sales comps value: 75th-pct $/sq ft x net sq ft', 'IF({units}<=2,%s,IF({units}=3,%s,%s))*{tsf}' % (IN('psf2'), IN('psf3'), IN('psf46')))
-L('fmvBase', 'Appraised value before add-ons', 'IF({ov_fmv}<>"",{ov_fmv},IF({basis}="prec",%s,IF({basis}="custom",%s,IF({basis}="lb",%s,IF({basis}="comps",{compsVal},{med})))))' % (IN('prec'), IN('custom'), IN('lb')))
+L('fmvBase', 'Appraised value before add-ons', 'IF({ov_fmv}<>"",{ov_fmv},IF({basis}="prec",%s,IF({basis}="custom",%s,IF({basis}="lb",%s,IF({basis}="comps",{compsVal},IF({basis}="nbhd",{nbVal},{med}))))))' % (IN('prec'), IN('custom'), IN('lb')))
 L('fmv', 'APPRAISED VALUE (FMV)', '{fmvBase}+{featVal}')
 L('salesTotal', 'GROSS SALES PRICE (all units)', 'IF({condo}=1,{fmv}*%s,{fmv})' % IN('condoVal'))
 L('tsf', 'Net sq ft, all units', '{ownerSF}+{rented}*{rentSF}', NUM)
