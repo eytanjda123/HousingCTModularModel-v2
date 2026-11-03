@@ -611,7 +611,7 @@ table.cvt{margin-top:4px} table.cvt i.sw{display:inline-block;width:10px;height:
 .top-in>.actions{order:4;flex-basis:100%;gap:6px;padding-top:2px;border-top:1px dashed var(--rule-2)}
 .top-in>.actions .btn{font-size:.82rem;padding:4px 10px}
 #flow .node.hov rect.box{stroke:var(--ink);stroke-width:2.2}
-@media (min-width:1320px){.top-in{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center}.top-in>.actions{grid-column:1/-1;order:6}.exportbtn{order:5;margin-left:8px}.top-in .brand h1{white-space:nowrap;font-size:1.35rem}.top-in .brand small{font-size:.72rem}}
+@media (min-width:1320px){.top-in{display:grid;grid-template-columns:minmax(0,1fr) auto auto;column-gap:20px;align-items:center}.top-in>.actions{grid-column:1/-1;order:6}.exportbtn{order:5;margin-left:8px}.top-in .brand h1{white-space:nowrap;font-size:1.35rem}.top-in .brand small{font-size:.72rem}}
 @media (max-width:700px){.exportbtn span{display:none}.exportbtn{padding:10px 12px}}
 
 /* input search */
@@ -659,7 +659,7 @@ table.ivt .ss{font-size:.76rem;color:var(--ink-2)}
 .xpgrp .exportbtn{order:0;margin:0}
 .sharebtn{font:inherit;font-size:.78rem;font-weight:600;color:var(--accent);background:transparent;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:8px;padding:3px 8px;cursor:pointer}
 .sharebtn:hover{background:var(--accent-soft)}
-@media (min-width:1320px){.xpgrp{order:5;margin-left:8px}}
+.actions .xpgrp{order:9;margin-left:auto;flex-direction:row;align-items:center;gap:8px}.actions{flex-basis:100%}
 .actions .resetbtn{flex-direction:row;gap:5px;font-size:.78rem;padding:4px 9px;border-radius:8px}
 .actions .helpq{width:30px;padding:4px 0;text-align:center;font-weight:700;border-radius:50%}
 /* rail head: legend in an i popover */
@@ -728,10 +728,10 @@ table.heat td[data-rank="worst"]::after{content:" ▼";font-size:.65rem;color:va
       <button class="btn helpq" id="helpBtn" title="Show the guide" aria-label="Guide">?</button>
       <button class="btn" id="pin" title="Make the current settings the comparison point for every change shown">Pin baseline</button>
       <span class="basenote" id="basenote">Baseline: defaults</span>
-    </div>
     <div class="xpgrp">
     <button class="exportbtn" id="exportBtn" type="button" title="Export: the live Excel model, the city models and charts workbook, or a change summary"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Export</span></button>
       <button class="sharebtn" id="share">Share link</button>
+    </div>
     </div>
   </div>
 </header>
