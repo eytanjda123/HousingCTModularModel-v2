@@ -80,7 +80,7 @@ HTCC_T = ['Grant toward the developer gap', 'Revolving construction loan fund']
 FACT_T = ['Shoreline quote: factory package', 'Reframe public range: all-in building', 'Faculty placeholder: factory + field', 'Custom factory package']
 VERT = [('roof', 'Roofing', 8.627, 0.15), ('envelope', 'Exterior envelope', 9.371, 0), ('interior', 'Interior construction', 55.067, 0), ('siding', 'Siding', 9.996, 1), ('windows', 'Windows and doors', 10.520, 0), ('finishes', 'Finishes', 27.146, 0), ('hvac', 'HVAC', 11.246, 1), ('elec', 'Electrical', 12.288, 0), ('plumbing', 'Plumbing', 12.551, 0.2)]
 LEVK = [('solar', 'levSolar', None, 'No solar in the base budget'), ('fence', 'levFence', None, 'No fencing and security'), ('pattern', 'levPatternOn', 'levPattern', 'Pattern book (architect fee)'), ('zoning', 'levZoningOn', 'levZoning', 'As-of-right zoning (legal)'), ('permit', 'levPermitOn', 'levPermit', 'As-of-right permits and fee discount'), ('cdfi', 'levCdfiOn', 'levCdfi', 'CDFI or foundation bridge financing'), ('realtor', 'levRealtorOn', 'levRealtor', 'Realtor discount on the commission'), ('fee', 'levFeeOn', 'levFee', 'Developer fee capped'), ('land', 'levLand', None, 'No acquisition cost')]
-SIDE_B = {'capBasis', 'allinCap', 'ownerAMI', 'hhSize', 'rentAMI', 'rentShare', 'capMkt', 'voucherOn', 'vpsPct', 'ami50', 'mill', 'assess', 'assess4', 'dpa', 'abateOn', 'abateVal', 'rate', 'term', 'dp', 'mip', 'rentCredit', 'lenderCap', 'ownerCap', 'ins', 'energy', 'common', 'maintPct', 'vac', 'mitType', 'energyThresh', 'taxBasis', 'taxCustom', 'incAssist', 'tto', 'otherAssist', 'useHB', 'empDpa', 'condoFee'}
+SIDE_B = {'capBasis', 'allinCap', 'ownerAMI', 'hhSize', 'rentAMI', 'rentShare', 'capMkt', 'voucherOn', 'vpsPct', 'ami50', 'mill', 'assess', 'assess4', 'dpa', 'chfaAmi', 'abateOn', 'abateVal', 'rate', 'term', 'dp', 'mip', 'rentCredit', 'lenderCap', 'ownerCap', 'ins', 'energy', 'common', 'maintPct', 'vac', 'mitType', 'energyThresh', 'taxBasis', 'taxCustom', 'incAssist', 'tto', 'otherAssist', 'useHB', 'empDpa', 'condoFee'}
 SIDE_P = {'city', 'units', 'ownerBR', 'rentBR', 'own', 'basis', 'med2', 'med3', 'med46', 'psf2', 'psf3', 'psf46', 'prec', 'custom', 'lb', 'condoVal'}
 bfill = PatternFill('solid', fgColor='FFEDE4FA'); dfill = PatternFill('solid', fgColor='FFDDF2EA')
 def sidefill(k):
@@ -275,7 +275,8 @@ add('whDisc', 'Bulk discount on those purchases', 0.10, PCT1, PH, 'Placeholder: 
 add('whInvMonths', 'Months materials sit in storage', 6, NUM, PH, 'Placeholder.')
 add('whInvRate', 'Cost of money tied up in inventory', 0.08, PCT2, PH, 'Same as the construction-loan rate.')
 sect('8. CITY DATA AND APPRAISAL')
-add('ami50', 'HUD 50% income limit, 4-person (focus city)', 62250, USD, V, 'HUD FY2026 income limits: ' + U['hudil'] + ' (Waterbury summary confirms $62,250 / $99,600.)')
+add('chfaAmi', '100% AMI for buyers, CHFA Time To Own chart (focus city)', 123200, USD, V, 'CHFA Time To Own AMI limits, rev. 6/13/2026: New Haven $123,200, Hartford $129,200, Waterbury $114,000: https://www.chfa.org/assets/1/6/027_Time_To_Own_-_AMI__Rev._6-13-26.pdf. Treated as the 4-person figure; HUD household-size factors apply.')
+add('ami50', 'HUD 50% income limit, 4-person (focus city; sets rent limits only)', 62250, USD, V, 'HUD FY2026 income limits: ' + U['hudil'] + ' (Waterbury summary confirms $62,250 / $99,600.)')
 add('med2', 'Median sale, existing two-families', 345000, USD, V, OPMS)
 add('med3', 'Median sale, existing three-families', 430000, USD, V, 'Same source.')
 add('med46', 'Median sale, existing four-families (used for 4-6 units)', 535000, USD, V, 'Same source.')
@@ -638,11 +639,12 @@ L('softAll', 'SOFT COSTS INCLUDING FINANCING', '{soft}+{finance}')
 L('tdc', 'TOTAL DEVELOPMENT COST (TDC)', '{preFee}+{feeC}')
 L('tdcUnit', 'TDC per unit', '{tdc}/{units}')
 L('tdcPSF', 'TDC per gross sq ft', '{tdc}/{gsf}', USD2)
-L('ami100', '100% AMI (2 x HUD 50% limit)', '2*%s' % IN('ami50'))
+L('ami100', '100% AMI for rent limits (2 x HUD 50% limit)', '2*%s' % IN('ami50'))
+L('amiBuy', '100% AMI for buyers (CHFA chart)', IN('chfaAmi'))
 hhr = 'Inputs!$C$%d:$C$%d' % (hh_r0, hh_r0 + 5)
 L('hhN', 'Household size (rounded)', 'MAX(1,ROUND(%s,0))' % IN('hhSize'), NUM)
 L('hhF', 'HUD household-size factor', 'IF({hhN}<=6,INDEX(%s,{hhN}),INDEX(%s,6)+0.08*({hhN}-6))' % (hhr, hhr), DEC)
-L('income', 'Owner household income', '{ami100}*{hhF}*{ami}')
+L('income', 'Owner household income', '{amiBuy}*{hhF}*{ami}')
 L('brF', 'Rent-limit factor (rental BR)', 'INDEX(%s,MATCH(%s,%s,0))' % (brcol(1), IN('rentBR'), BRR), DEC)
 L('ua', 'Tenant utility allowance', 'INDEX(%s,MATCH(%s,%s,0))' % (brcol(2), IN('rentBR'), BRR))
 L('market', 'Market asking rent', 'INDEX(%s,MATCH(%s,%s,0))' % (brcol(3), IN('rentBR'), BRR))
@@ -700,7 +702,7 @@ L('afford', 'Most the buyer can pay', '{capacity}+{tto}')
 L('salesGap', 'SALES GAP (price - affordable price)', 'MAX(0,{unitValue}-{afford})')
 L('hb', 'DOH homebuyer subsidy', 'IF(%s,{salesGap},0)' % yn('useHB'))
 L('financed', "Buyer's own financed price", 'MIN({unitValue},{afford})-{tto}')
-L('incomeR', 'Condo: other-unit buyer income', 'IF({condoNR}>0,{ami100}*{brF}*{ami},0)')
+L('incomeR', 'Condo: other-unit buyer income', 'IF({condoNR}>0,{amiBuy}*{brF}*{ami},0)')
 L('unitValueR', 'Condo: price of each other unit', '{salesTotal}*{shR}')
 L('taxR', 'Condo: other-unit property tax (per month)', '{taxBldgFull}*{shR}*(1-{abatePct})', USD2)
 L('energyR', 'Condo: other-unit energy (per month)', '%s*IF({ownerSF}>0,{rentSF}/{ownerSF},1)' % IN('energy'), USD2)
@@ -1140,7 +1142,7 @@ for j, cty in enumerate(CITIES):
     c = tc.cell(5, 3 + 3 * j, cty); c.font = hdr; c.fill = hfill; tc.cell(5, 4 + 3 * j).fill = hfill; tc.cell(5, 5 + 3 * j).fill = hfill
     for b, h in enumerate(['Existing homes', 'Base case', 'DOH precedent']):
         x = tc.cell(6, 3 + 3 * j + b, h); x.font = bold; x.alignment = WRAP
-TCM = [('City inputs: HUD 50% limit (4-person)', 'ami50', USD), ('City inputs: mill rate', 'mill', DEC), ('City inputs: assessment ratio', 'assess', PCT1), ('City inputs: insurance per unit per year', 'ins', USD), ('City inputs: market rent, rental unit', 'market', USD),
+TCM = [('City inputs: CHFA 100% AMI (buyers)', 'chfaAmi', USD), ('City inputs: HUD 50% limit (4-person)', 'ami50', USD), ('City inputs: mill rate', 'mill', DEC), ('City inputs: assessment ratio', 'assess', PCT1), ('City inputs: insurance per unit per year', 'ins', USD), ('City inputs: market rent, rental unit', 'market', USD),
        ('Total development cost', 'tdc', USD), ('Appraised value', 'fmv', USD), ('Most the buyer can pay', 'afford', USD), ('Sales gap', 'salesGap', USD), ('Remaining buyer gap', 'buyerRemain', USD), ('Developer gap (TDC - gross sales price)', 'devGap', USD),
        ('Developer-side money used', 'devUsed', USD), ('Remaining developer gap', 'remain', USD), ('Rent charged, rental unit', 'rent', USD), ("Owner's net monthly cost", 'net', USD), ('Net cost as % of income', 'netPct', PCT1), ('Surplus / shortfall vs MIT (per year)', 'residual', USD)]
 for i, (l, k, fm) in enumerate(TCM):
