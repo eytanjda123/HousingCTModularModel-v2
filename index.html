@@ -576,6 +576,8 @@ table.sm-sites small{display:block;color:var(--ink-3);font-size:.72rem}
 table.sm-sites tr.off th,table.sm-sites tr.off td{opacity:.55}
 .sm-two{display:grid;grid-template-columns:1fr;gap:12px}
 .sm-lines{margin-top:8px}.sm-lines summary{cursor:pointer;font-size:.86rem;color:var(--accent)}
+.node .gst{font-size:9.5px;font-weight:700}
+.node[data-gap="short"] .box{stroke:var(--bad);stroke-width:1.6}
 .sm-key{display:inline-flex;align-items:center;gap:4px;margin-right:10px;white-space:nowrap}.sm-key i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--rule)}
 .sm-map{font-size:.84rem;color:var(--ink-2);margin:6px 0 0;padding-left:18px}
 #smCtls .ctl-grp{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 -2px}
@@ -2180,6 +2182,7 @@ function buildFlow(){
     const p=el("path",{d:`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:"edge"},eg);EDGE_EL.push({from:d,to:n.id,el:p});}));
   NV.forEach(n=>{const p=POS[n.id];const g=el("g",{class:"node "+(n.type==="input"?"input "+(FOLD_BUY.has(n.id)?"nb":FOLD_DEV.has(n.id)||n.id==="i_dsub"||n.id==="i_nmtc"?"nd":"np"):n.type==="ny"?"ny":n.out?"output":"calc")+(n.id==="x_buyer"?" folded":"")+(n.id==="o_tdc"&&FOLD.dev?" folded":"")+(ROLL.has(n.id)?" folded rolled":"")+(p.half!==undefined?" half":""),transform:`translate(${p.x},${p.y})`,tabindex:"0",role:"button","aria-label":n.label},ng);
     el("rect",{width:p.w,height:p.h,rx:5,ry:5,class:"box"},g);
+    const gt=GAP_IDS.includes(n.id)?el("rect",{width:p.w,height:p.h,rx:5,ry:5,class:"gtint","pointer-events":"none"},g):null;
     if(n.side) el("rect",{x:0,y:0,width:5,height:p.h,rx:2,fill:n.side==="b"?"var(--side-b)":"var(--side-d)",class:"sidebar"},g);
     const lb=el("text",{x:11,y:n.col===0?14:17,class:"lbl"},g); lb.dataset.full=n.id==="o_tdc"&&FOLD.dev?"TDC (cost build folded)":(p.half!==undefined&&n.short)||n.label; lb.textContent=lb.dataset.full;
     const v=el("text",{x:11,y:n.col===0?28:37,class:"val"},g);
@@ -2197,7 +2200,8 @@ function buildFlow(){
     }
     if(CONF_ABBR[n.conf]&&n.col===0){el("text",{x:p.w-8,y:14,class:"conf","text-anchor":"end",fill:`var(${CONF_VAR[n.conf]||"--tag-ph"})`},g).textContent=CONF_ABBR[n.conf];}
     if(n.term&&GLOSS[n.term]) stitle(g,GLOSS[n.term][0]+": "+GLOSS[n.term][1]);
-    NODE_EL[n.id]={g,v,d,ib,lb};
+    const gs=gt?el("text",{x:p.w-8,y:n.col===0?28:37,class:"gst","text-anchor":"end"},g):null;
+    NODE_EL[n.id]={g,v,d,ib,lb,gt,gs};
     g.addEventListener("mouseenter",()=>{if(!lock)trace(n.id,"both");});
     g.addEventListener("mouseleave",()=>untrace());
     g.addEventListener("focus",()=>{if(!lock)trace(n.id,"both");});
@@ -2287,7 +2291,31 @@ function renderFlow(){
       if(P&&Math.abs(P[n.r]-v)>1e-9){o.g.classList.remove("pulse");void o.g.getBBox();o.g.classList.add("pulse");}
     }
   });
+  renderGapState(R);
   renderImpact();
+}
+/* gap boxes: red when a gap is left, amber when programs cover it, green with a cushion; the shade deepens with size */
+const GAP_IDS=["o_sgap","x_buyer","o_dgap","o_remain"];
+function gapStates(R){
+  const s=S.shared,inc=s.inc,rev=inc.htcc&&s.htccMode==="revolve",V=Math.max(1,R.unitValue),T=Math.max(1,R.tdc);
+  const buyer=R.buyerRemain>0.5?{lvl:"short",t:R.buyerRemain/(0.25*V),txt:"short "+usdK(R.buyerRemain),tip:"The buyer can't cover "+usd(R.buyerRemain)+" even after the subsidies switched on."}
+    :R.salesGapAll>0.5?{lvl:"cov",t:0.5,txt:"covered",tip:"A sales gap of "+usd(R.salesGapAll)+", filled by the DOH homebuyer subsidy."}
+    :{lvl:"ok",t:(R.afford-R.unitValue)/(0.15*V),txt:"+"+usdK(Math.max(0,R.afford-R.unitValue))+" room",tip:"The buyer can pay "+usd(Math.max(0,R.afford-R.unitValue))+" more than the price."};
+  const cap=(inc.hdf?s.hdf:0)+(inc.ahp?s.ahp:0)+((inc.htcc&&!rev)?s.htcc/s.htccHomes:0)+R.dohRentAvail+R.nmtcNet+(inc.doh?R.dohCapBldg:0), unused=Math.max(0,cap-R.devGap);
+  const remain=R.remain>0.5?{lvl:"short",t:R.remain/(0.25*T),txt:"short "+usdK(R.remain),tip:"Developer-side programs leave "+usd(R.remain)+" unfunded."}
+    :{lvl:"ok",t:unused/(0.25*T),txt:"+"+usdK(unused)+" unused",tip:usd(unused)+" of program room is left over (at the amounts set)."};
+  const dev=R.remain>0.5?{lvl:"short",t:R.remain/(0.25*T),txt:"short "+usdK(R.remain),tip:remain.tip}
+    :R.devGap>0.5?{lvl:"cov",t:0.5,txt:"covered",tip:"A developer gap of "+usd(R.devGap)+", covered by the programs switched on."}
+    :{lvl:"ok",t:(R.proceeds-R.tdc)/(0.15*T),txt:"+"+usdK(Math.max(0,R.proceeds-R.tdc))+" surplus",tip:"The sales price exceeds the cost."};
+  return {o_sgap:buyer,x_buyer:buyer,o_dgap:dev,o_remain:remain};
+}
+function renderGapState(R){
+  const G=gapStates(R);
+  GAP_IDS.forEach(id=>{const o=NODE_EL[id];if(!o||!o.gt)return;const x=G[id],t=Math.max(0,Math.min(1,x.t||0));
+    const col=x.lvl==="short"?"var(--bad)":x.lvl==="cov"?"var(--warn)":"var(--good)", a=x.lvl==="short"?14+30*t:x.lvl==="cov"?16:6+24*t;
+    o.gt.style.fill=`color-mix(in srgb,${col} ${Math.round(a)}%,transparent)`;
+    o.gs.textContent=x.txt;o.gs.style.fill=col;{let dw=0;try{dw=o.d.textContent?o.d.getComputedTextLength()+8:0;}catch(e){}o.gs.setAttribute("x",(+o.gt.getAttribute("width"))-8-dw);}o.g.dataset.gap=x.lvl;
+    let tt=o.g.querySelector("title.gtt");if(!tt){tt=document.createElementNS("http://www.w3.org/2000/svg","title");tt.setAttribute("class","gtt");o.gt.appendChild(tt);}tt.textContent=x.tip;});
 }
 function chip(d,fmt,good){const t=deltaText(d,fmt);if(!t)return `<span class="chip zero">no change</span>`;return `<span class="chip ${deltaClass(d,good)}">${t}</span>`;}
 function renderKPIs(){
